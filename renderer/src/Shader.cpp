@@ -5,6 +5,9 @@
 #include<fstream>
 #include<sstream>
 
+//for cam matrix type converion
+#include<glm/gtc/type_ptr.hpp>
+
 //for error correction & handling
 #include <iostream>
 
@@ -79,10 +82,23 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 
 	glDeleteShader(vertId);
 	glDeleteShader(fragId);
+
+
+	CAMERA_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "camMatrix" );
 }
 
 Shader::~Shader(){
 	glDeleteProgram(PROGRAM_ID);
+}
+//kyuki me camera toh obviauslly banane wala hu so why not store the loc value in shader object
+void Shader::camMatrix(const glm::mat4& Value)
+{
+	glUniformMatrix4fv(CAMERA_MAT_LOC, 1, GL_FALSE, glm::value_ptr(Value));
+}
+
+void Shader::DEB_ModelMatTest(const char* name, glm::mat4& Value)
+{
+	glUniformMatrix4fv(glGetUniformLocation(PROGRAM_ID, name), 1, GL_FALSE, glm::value_ptr(Value));
 }
 
 unsigned int Shader::Activate(){
