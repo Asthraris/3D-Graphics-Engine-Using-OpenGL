@@ -66,45 +66,47 @@ void Camera::Move(const float deltaTime,GLFWwindow* window)
 	}
 }
 
-void Camera::Look(const float deltaTime, GLFWwindow* window) 
-	{
-		static double lastXpos, lastYpos;
-		double Xpos, Ypos;
-		float offsetX, offsetY;
-		//mistake 1 - not making yaw nas pitch static
-		static float yaw = -90.0f, pitch = 0.0f;
-		glm::vec3 tempFocus;
+void Camera::Look(const float deltaTime, GLFWwindow* window) {
+	static double lastMousePos_X = 0.0f;
+	static double lastMousePos_Y = 0.0f;
+	static float YAW = -90.0f;
+	static float PITCH = 0.0f;
 
-		glfwGetCursorPos(window, &Xpos, &Ypos);
-		if (FIRST_MOVE) {
-			lastXpos = Xpos;
-			lastYpos = Ypos;
-			FIRST_MOVE = false;
-		}
-		offsetX = SENSITIVITY * (float)(Xpos - lastXpos) * deltaTime;
-		offsetY = SENSITIVITY * (float)(lastYpos - Ypos) * deltaTime;// idk why its reversed do research
+	double currMousePos_X, currMousePos_Y;
+	glfwGetCursorPos(window, &currMousePos_X, &currMousePos_Y);
 
-		/*Yaw and Pitch are two of the three angles used to describe the orientation of an object in a 3D space.The third angle is Roll.
-
-			Yaw: This is the rotation around the vertical axis(usually the y - axis).Think of yaw as turning your head left or right.If you imagine looking down at an object from above, yaw would be the angle you turn left or right.
-
-			Pitch : This is the rotation around the lateral or horizontal axis(usually the x - axis).Imagine nodding your head up and down; that's pitch. It tilts the object up or down.*/
-
-			// yaw & pitch records czmera angle preview and used to set next value
-		yaw += offsetX;
-		pitch += offsetY;
-
-		if (pitch > 89.0f) pitch = 89.0f;
-		if (pitch < -89.0f) pitch = -89.0f;
-		/*
-		agar y me topmost ans bottom most lock karna hotoh
-		*/
-
-		tempFocus.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-		tempFocus.y = sin(glm::radians(pitch));
-		tempFocus.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-		FOCUS_VECTOR = glm::normalize(tempFocus);
-		lastXpos = Xpos;
-		lastYpos = Ypos;
+	// Handle first move to initialize the last mouse position
+	if (FIRST_MOVE) {
+		lastMousePos_X = currMousePos_X;
+		lastMousePos_Y = currMousePos_Y;
+		FIRST_MOVE = false;
 	}
+
+	// Calculate the mouse offsets
+	float offset_X = SENSITIVITY * (float)(currMousePos_X - lastMousePos_X) * deltaTime;
+	float offset_Y = SENSITIVITY * (float)(lastMousePos_Y - currMousePos_Y) * deltaTime;
+	
+	// Update YAW and PITCH
+	YAW += offset_X;
+	PITCH += offset_Y;
+	
+	// Clamp PITCH in degrees to avoid gimbal lock
+	if (PITCH > 89.0f) PITCH = 89.0f;
+	if (PITCH < -89.0f) PITCH = -89.0f;
+
+	// Convert YAW and PITCH to radians for calculations
+	float yawRad = glm::radians(YAW);
+	float pitchRad = glm::radians(PITCH);
+	
+	// Calculate the new focus vector
+	glm::vec3 tempFocus;
+	tempFocus.x = cos(yawRad) * cos(pitchRad);
+	tempFocus.y = sin(pitchRad);
+	tempFocus.z = sin(yawRad) * cos(pitchRad);
+	FOCUS_VECTOR = glm::normalize(tempFocus);
+	
+	// Update the last mouse position
+	lastMousePos_X = currMousePos_X;
+	lastMousePos_Y = currMousePos_Y;
+}
 
