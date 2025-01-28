@@ -10,7 +10,7 @@
 
 //for running -temp
 #include "../Cube.h"
-#include "../Terrain.h"
+#include "../Chunks.h"
 
 
 //problem ye aati thi ke func ke ander mai jo bhi obj banata tha ur uska reference kahinour ano.func me use karta tha tab tak destruct call hojata tha clearing that obj only pointer me adrress hota tha but not pointer 
@@ -60,16 +60,21 @@ void Renderer::Run()
 	ACTIVE_SHADER = simple.Activate();
 
 
-	Camera cam(60.0f, 0.1f, 10.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT);
+	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT);
 	glm::mat4 Model = glm::mat4(1.0f);
 	Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, -3.0f));
 	simple.DEB_ModelMatTest("Modle", Model);
 	
 
-	
-	Meshes.push_back(genTerrain(8,8,0.1,2.0));
-	//Meshes.push_back(genCube());
-	
+	for (int x = -2; x < 2; x++) {
+		for (int y = -2; y < 2; y++){
+			Terrain[Chunk(x, y)] = genChunk(x, y);
+		}
+	}
+
+	//Terrain[Chunk(0, 0)] = genChunk(0, 0);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
@@ -77,10 +82,12 @@ void Renderer::Run()
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
 		cam.renderView(simple);
-	
-		for (const auto& mesh:Meshes) {
-			mesh->render();
+		for (int x = -2; x < 2; x++) {
+			for (int y = -2; y < 2; y++) {
+				Terrain[Chunk(x, y)] ->render();
+			}
 		}
+		//Terrain[Chunk(0, 0)]->render();
 			
 		glfwSwapBuffers(window);
 		glfwPollEvents();

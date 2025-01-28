@@ -26,6 +26,7 @@ void Shape::Update(VERTEX* vert, int nv, unsigned short* ind, int ni)
 void Shape::render()
 {
 	glBindVertexArray(VAO);
+	//glDrawArrays(GL_TRIANGLES, 0, num_verts);
 	glDrawElements(GL_TRIANGLES, num_inds, GL_UNSIGNED_SHORT, nullptr);
 }
 

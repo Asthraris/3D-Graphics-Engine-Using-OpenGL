@@ -6,6 +6,6 @@ in float Height;
 
 void main(){
 	
-	OUTPUT = vec4(0.0,Height,0.0,1.0);
+		OUTPUT = vec4(0.0,Height,0.0,1.0);
 
 }
