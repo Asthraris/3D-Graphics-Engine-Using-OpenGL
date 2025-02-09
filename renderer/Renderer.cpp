@@ -8,9 +8,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "terrain/Terrain.h"
 //for running -temp
-#include "../Cube.h"
-#include "../Chunks.h"
 
 
 //problem ye aati thi ke func ke ander mai jo bhi obj banata tha ur uska reference kahinour ano.func me use karta tha tab tak destruct call hojata tha clearing that obj only pointer me adrress hota tha but not pointer 
@@ -23,7 +22,7 @@ float Timer() {
 	return dt;
 }
 
-Renderer::Renderer(const int& width,const int& height, const char* winName):ACTIVE_SHADER(0){
+Renderer::Renderer(const int& width,const int& height, const char* winName):ACTIVE_SHADER(0),RENDER_DISTANCE(4){
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -64,30 +63,20 @@ void Renderer::Run()
 	glm::mat4 Model = glm::mat4(1.0f);
 	Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, -3.0f));
 	simple.DEB_ModelMatTest("Modle", Model);
+
+	Terrain base(RENDER_DISTANCE);
 	
-
-	for (int x = -2; x < 2; x++) {
-		for (int y = -2; y < 2; y++){
-			Terrain[Chunk(x, y)] = genChunk(x, y);
-		}
-	}
-
-	//Terrain[Chunk(0, 0)] = genChunk(0, 0);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
 	
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
+		
+		CAMERA_CHUNK_LOC = cam.giveCamChunk();
 		cam.renderView(simple);
-		for (int x = -2; x < 2; x++) {
-			for (int y = -2; y < 2; y++) {
-				Terrain[Chunk(x, y)] ->render();
-			}
-		}
-		//Terrain[Chunk(0, 0)]->render();
+		
+		base.DynamicLoad(CAMERA_CHUNK_LOC);
 			
 		glfwSwapBuffers(window);
 		glfwPollEvents();

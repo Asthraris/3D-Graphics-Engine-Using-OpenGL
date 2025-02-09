@@ -1,9 +1,15 @@
 #include "Camera.h"
 
 
+
+
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
+
+#define CHUNK_SIZE 8
 //for upadting matix
+
+
 
 const float SPEED = 3.0f;
 const float SENSITIVITY = 90.0f;
@@ -12,14 +18,15 @@ bool FIRST_MOVE = true;
 
 
 Camera::Camera(float fov, float near, float far, float Aspectrat) :
+	CAM_CHUNK ( glm::vec2(0.0)),
 	FIELD_OF_VIEW(glm::radians(fov)),
 	NEAR_PLANE(near),
 	FAR_PLANE(far),
 	ASPECT_RATIO(Aspectrat)
 {
 	UP_VECTOR = glm::vec3(0.0f , 1.0f , 0.0f);
-	FOCUS_VECTOR = glm::vec3(0.0f,0.0f,0.0f);
-	POSITION_VECTOR = glm::vec3(0.0f, 0.0f, 3.0f);
+	FOCUS_VECTOR = glm::vec3(0.0f,0.0f,3.0f);
+	POSITION_VECTOR = glm::vec3(0.0f, 0.0f, 0.0f);
 
 	VIEW_MAT = glm::mat4(1.0f);
 	PERSPECTIVE_MAT = glm::perspective(FIELD_OF_VIEW,ASPECT_RATIO,NEAR_PLANE,FAR_PLANE);
@@ -64,6 +71,7 @@ void Camera::Move(const float deltaTime,GLFWwindow* window)
 		POSITION_VECTOR += SPEED * (-UP_VECTOR) * deltaTime;
 
 	}
+	CAM_CHUNK = glm::vec2((POSITION_VECTOR.x / CHUNK_SIZE), (POSITION_VECTOR.z / CHUNK_SIZE));
 }
 
 void Camera::Look(const float deltaTime, GLFWwindow* window) {
@@ -108,5 +116,9 @@ void Camera::Look(const float deltaTime, GLFWwindow* window) {
 	// Update the last mouse position
 	lastMousePos_X = currMousePos_X;
 	lastMousePos_Y = currMousePos_Y;
+}
+
+glm::vec2 Camera::giveCamChunk(){
+	return CAM_CHUNK;
 }
 

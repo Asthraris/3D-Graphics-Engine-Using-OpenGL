@@ -4,10 +4,7 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 
-struct VERTEX {
-	glm::vec3 POS;
-	glm::vec3 COLOR;
-};
+#include "renderer/vertex.h"
 
 class Shape
 {

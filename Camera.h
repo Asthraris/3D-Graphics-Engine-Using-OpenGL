@@ -12,6 +12,8 @@ private:
 	glm::mat4 VIEW_MAT, PERSPECTIVE_MAT;
 
 	float FIELD_OF_VIEW, NEAR_PLANE, FAR_PLANE, ASPECT_RATIO;
+
+	glm::vec2 CAM_CHUNK;
 	
 public:
 	Camera(float fov, float near,float far, float Aspectrat);
@@ -19,6 +21,7 @@ public:
 	void renderView(Shader& active);
 	void Move(const float deltaTime, GLFWwindow* window);
 	void Look(const float deltaTime, GLFWwindow* window);
+	glm::vec2 giveCamChunk();
 
 };
 
