@@ -64,7 +64,7 @@ void Renderer::Run()
 	Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, -3.0f));
 	simple.DEB_ModelMatTest("Modle", Model);
 
-	Terrain base(RENDER_DISTANCE);
+	Terrain basic;
 	
 	
 	while (!glfwWindowShouldClose(window)) {
@@ -73,10 +73,9 @@ void Renderer::Run()
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
 		
-		CAMERA_CHUNK_LOC = cam.giveCamChunk();
 		cam.renderView(simple);
 		
-		base.DynamicLoad(CAMERA_CHUNK_LOC);
+		basic.dynamicLoad(cam.giveCamChunk());
 			
 		glfwSwapBuffers(window);
 		glfwPollEvents();

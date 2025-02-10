@@ -4,22 +4,18 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
 #include "../vertex.h"
+#include "../../Shape.h"
 
-const int CHUNK_SIZE = 8;
-const float VERTEX_DENSITY = 0.5;
-const int TOTAL_MINISQ = ceil(CHUNK_SIZE / VERTEX_DENSITY) + 1;
-const int NUM_VERTICES = TOTAL_MINISQ * TOTAL_MINISQ;
-const int NUM_INDICES = (TOTAL_MINISQ - 1) * (TOTAL_MINISQ - 1) * 6;
-
-struct HeightMap{
-	VERTEX vertices[1536];
-};
-
+#define CHUNK_SIZE  8
+#define VERTEX_DENSITY  0.5
+#define  TOTAL_MINISQ  17
+#define  NUM_VERTICES  289
+#define  NUM_INDICES  1536
 
 float genHeight(float x, float z,const int octaves) {
     float Height = 0.0;
-    float Amplitude = 10.0,
-        Frequency = 0.05;
+    float Amplitude = 10.0;
+    float Frequency = 0.05;
     for (int i = 0; i < octaves; i++) {
         Height += glm::perlin(glm::vec2(x * Frequency, z * Frequency)) * Amplitude; // Scaled height
         Amplitude /= 8;
@@ -28,16 +24,17 @@ float genHeight(float x, float z,const int octaves) {
     return Height;
 }
 
-std::shared_ptr<HeightMap> genChunk(int x,int y) {
+std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_y) {
     float HEIGHT;
     glm::vec3 COLOR;
     int index = 0;
-    std::shared_ptr<HeightMap> temp = std::make_shared<HeightMap>();
+    std::shared_ptr<Shape> temp = std::make_shared<Shape>();
+    VERTEX vertices[1536];
     for (int i = 0; i < TOTAL_MINISQ; ++i) {
         for (int j = 0; j < TOTAL_MINISQ; ++j) {
-            float dx = (x * CHUNK_SIZE) + i * VERTEX_DENSITY;
-            float dz = (y * CHUNK_SIZE) + j * VERTEX_DENSITY;
-            HEIGHT = genHeight(dx, dz, 8);
+            float dx = (chunk_x * CHUNK_SIZE) + i * VERTEX_DENSITY;
+            float dz = (chunk_y * CHUNK_SIZE) + j * VERTEX_DENSITY;
+            HEIGHT = genHeight(dx, dz,8);
 
             if (HEIGHT < 0.0) {
                 COLOR = glm::vec3(0.0f, 0.0f, 1.0f + HEIGHT / 8);
@@ -48,8 +45,30 @@ std::shared_ptr<HeightMap> genChunk(int x,int y) {
             else {
                 COLOR = glm::vec3(0.0, 0.2 > (HEIGHT / 8) ? 0.2 : HEIGHT / 8, 0.0f);
             }
-            temp->vertices[index++] = {glm::vec3(dx,HEIGHT , dz),COLOR};
+            vertices[index++] = {glm::vec3(dx,HEIGHT , dz),COLOR};
         }
     }
+        unsigned short indices[NUM_INDICES];
+        index = 0;
+        for (int i = 0; i < TOTAL_MINISQ - 1; ++i) {
+            for (int j = 0; j < TOTAL_MINISQ - 1; ++j) {
+                int bot_left = i * TOTAL_MINISQ + j;
+                int bot_right = bot_left + 1;
+                int top_left = bot_left + TOTAL_MINISQ;
+                int top_right = top_left + 1;
+
+                // First triangle
+                indices[index++] = bot_left;
+                indices[index++] = top_left;
+                indices[index++] = bot_right;
+
+                // Second triangle
+                indices[index++] = bot_right;
+                indices[index++] = top_left;
+                indices[index++] = top_right;
+            }
+        }
+        temp->Update(vertices, NUM_VERTICES, indices, NUM_INDICES);
+        temp->send();
     return temp;
 }

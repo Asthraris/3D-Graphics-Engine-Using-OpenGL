@@ -18,7 +18,6 @@ private:
 	GLFWwindow* window;
 	float SKY_COLOR[4] = {0.5,0.5,7.0,1.0};
 	unsigned int ACTIVE_SHADER;
-	glm::vec2 CAMERA_CHUNK_LOC;
 	int RENDER_DISTANCE;
 
 public:
