@@ -28,17 +28,14 @@ float genHeight(float x, float z,const int octaves) {
 }
 
 std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z) {
-    float HEIGHT;
     int index = 0;
     std::shared_ptr<Shape> temp = std::make_shared<Shape>();
     VERTEX vertices[NUM_VERTICES];
     for (int i = 0; i < MAX_VER_LINE; ++i) {
         for (int j = 0; j < MAX_VER_LINE; ++j) {
             float dx = (chunk_x * CHUNK_SIZE) + i ;
-            float dz = (chunk_z * CHUNK_SIZE) + j ;
-            HEIGHT = genHeight(dx, dz,8);
-
-            vertices[index].POS = glm::vec3(dx,HEIGHT , dz);
+            float dz = (chunk_z * CHUNK_SIZE) + j;
+            vertices[index].POS = glm::vec3(dx, genHeight(dx, dz, 8), dz);
             index++;
         }
     }
@@ -51,13 +48,16 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z) {
                 int top_left = bot_left + MAX_VER_LINE;
                 int top_right = top_left + 1;
 
-                indices[index++] = bot_left;
-                indices[index++] = bot_right;
-                indices[index++] = top_left;
+                indices[index++] = bot_left;  // A
+                indices[index++] = bot_right; // C
+                indices[index++] = top_left;  // B
 
-                indices[index++] = top_left;
-                indices[index++] = bot_right;
-                indices[index++] = top_right;
+                indices[index++] = top_left;  // B
+                indices[index++] = bot_right; // C
+                indices[index++] = top_right; // D
+
+
+
 
             }
         }

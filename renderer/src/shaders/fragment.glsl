@@ -31,5 +31,5 @@ void main(){
 		vec3 terrainColor = mix(rock,grass,base);
 		
 		
-		OUTPUT = vec4(vec3(1.0),1.0);
+		OUTPUT = vec4(terrainColor,1.0);
 }

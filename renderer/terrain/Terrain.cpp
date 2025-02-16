@@ -13,7 +13,6 @@
 Terrain::Terrain()
 {
 	Model_Matrix = glm::mat4(1.0f);
-	Model_Matrix = glm::translate(Model_Matrix, glm::vec3(0.0f, 0.0f, 0.0f));
 }
 
 Terrain::~Terrain()
