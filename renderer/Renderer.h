@@ -17,7 +17,7 @@ private:
 	GLFWwindow* window;
 	float SKY_COLOR[4] = {0.5,0.5,7.0,1.0};
 	
-	int RENDER_DISTANCE;
+	int RENDER_DISTANCE;//ye implement krana baaki hai
 
 public:
 	Renderer(const int& width,const int& height,const char* winName);

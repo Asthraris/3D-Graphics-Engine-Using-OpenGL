@@ -62,23 +62,23 @@ void Renderer::Run()
 	float deltaTime;
 	bool firstrun = true;
 
-	
-
-
 	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
 	Terrain basic;
 
 
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
-		std::cout << 1.0/deltaTime << "\n";
+		//std::cout << 1.0/deltaTime << "\n";
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
 		
 		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk());
+		//SLIDER DEBUG METER
 		if (firstrun )checkError();
 		firstrun = false;
+		//SLIDER DEBUG METER
+
 			
 		glfwSwapBuffers(window);
 		glfwPollEvents();
