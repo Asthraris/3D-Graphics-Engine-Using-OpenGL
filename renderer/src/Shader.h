@@ -11,7 +11,7 @@ public:
 	Shader(const char* Vertpath,const char* Fragpath);
 	~Shader();
 	void camMatrix(const glm::mat4& Value);
-	void DEB_ModelMatTest(const char* name,glm::mat4& Value);
+	void UpdateModelMatrix(const char* name, float* Value);
 	unsigned int Activate();
 };
 

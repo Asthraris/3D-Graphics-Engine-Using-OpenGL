@@ -1,5 +1,8 @@
 #include "Shape.h"
 
+
+#include <iostream>
+
 Shape::Shape():num_verts(0),num_inds(0)
 {
 	glGenVertexArrays(1, &VAO);
@@ -45,4 +48,8 @@ void Shape::send()
 
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VERTEX), (void*)offsetof(VERTEX, COLOR));
 	glEnableVertexAttribArray(1);
+
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VERTEX), (void*)offsetof(VERTEX, NORMAL));
+	glEnableVertexAttribArray(2);
+
 }

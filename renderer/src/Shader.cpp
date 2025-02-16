@@ -96,9 +96,9 @@ void Shader::camMatrix(const glm::mat4& Value)
 	glUniformMatrix4fv(CAMERA_MAT_LOC, 1, GL_FALSE, glm::value_ptr(Value));
 }
 
-void Shader::DEB_ModelMatTest(const char* name, glm::mat4& Value)
+void Shader::UpdateModelMatrix(const char* name, float* Value)
 {
-	glUniformMatrix4fv(glGetUniformLocation(PROGRAM_ID, name), 1, GL_FALSE, glm::value_ptr(Value));
+	glUniformMatrix4fv(glGetUniformLocation(PROGRAM_ID, name), 1, GL_FALSE, Value);
 }
 
 unsigned int Shader::Activate(){

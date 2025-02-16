@@ -5,8 +5,8 @@
 
 
 //for debug model mat
+#include <iostream>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
 
 #include "terrain/Terrain.h"
 //for running -temp
@@ -37,9 +37,11 @@ Renderer::Renderer(const int& width,const int& height, const char* winName):ACTI
 	//glfw se humne glad procedure address liya fir typecast kiya to glad provided script then load kiya into glad
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	//for 3d rendering
-	glEnable(GL_DEPTH_TEST);
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
 	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], SKY_COLOR[3]);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
 
 	//making vertex as point  no fragment is running
 }
@@ -60,15 +62,16 @@ void Renderer::Run()
 
 
 	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT);
-	glm::mat4 Model = glm::mat4(1.0f);
-	Model = glm::translate(Model, glm::vec3(0.0f, 0.0f, -3.0f));
-	simple.DEB_ModelMatTest("Modle", Model);
-
-	Terrain basic;
 	
+	Terrain basic;
+	simple.UpdateModelMatrix("ModelMatrix",basic.getModelMatrix());
+
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
+		//std::cout << 1.0/deltaTime << "\n";
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);

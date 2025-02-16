@@ -7,10 +7,13 @@
 #include "../../Shape.h"
 
 #define CHUNK_SIZE  8
-#define VERTEX_DENSITY  0.5
-#define  TOTAL_MINISQ  17
-#define  NUM_VERTICES  289
-#define  NUM_INDICES  1536
+//MAX_VER_LINE = CHUNK_SIZE /VERTEX_DENSITY(1) +1
+#define  MAX_VER_LINE  9
+//NUM_VERTOCES = MAX_VER_LINE^2
+#define  NUM_VERTICES  81
+//NUM_indices = ((MAX_VER_LINE-1)^2) *6
+#define  NUM_INDICES  384  
+
 
 float genHeight(float x, float z,const int octaves) {
     float Height = 0.0;
@@ -24,49 +27,62 @@ float genHeight(float x, float z,const int octaves) {
     return Height;
 }
 
-std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_y) {
+std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z) {
     float HEIGHT;
-    glm::vec3 COLOR;
     int index = 0;
     std::shared_ptr<Shape> temp = std::make_shared<Shape>();
-    VERTEX vertices[1536];
-    for (int i = 0; i < TOTAL_MINISQ; ++i) {
-        for (int j = 0; j < TOTAL_MINISQ; ++j) {
-            float dx = (chunk_x * CHUNK_SIZE) + i * VERTEX_DENSITY;
-            float dz = (chunk_y * CHUNK_SIZE) + j * VERTEX_DENSITY;
+    VERTEX vertices[NUM_VERTICES];
+    for (int i = 0; i < MAX_VER_LINE; ++i) {
+        for (int j = 0; j < MAX_VER_LINE; ++j) {
+            float dx = (chunk_x * CHUNK_SIZE) + i ;
+            float dz = (chunk_z * CHUNK_SIZE) + j ;
             HEIGHT = genHeight(dx, dz,8);
 
-            if (HEIGHT < 0.0) {
-                COLOR = glm::vec3(0.0f, 0.0f, 1.0f + HEIGHT / 8);
-            }
-            else if (HEIGHT > 9.0) {
-                COLOR = glm::vec3(HEIGHT / 4, HEIGHT / 8, HEIGHT / 8);
-            }
-            else {
-                COLOR = glm::vec3(0.0, 0.2 > (HEIGHT / 8) ? 0.2 : HEIGHT / 8, 0.0f);
-            }
-            vertices[index++] = {glm::vec3(dx,HEIGHT , dz),COLOR};
+            vertices[index].POS = glm::vec3(dx,HEIGHT , dz);
+            index++;
         }
     }
         unsigned short indices[NUM_INDICES];
         index = 0;
-        for (int i = 0; i < TOTAL_MINISQ - 1; ++i) {
-            for (int j = 0; j < TOTAL_MINISQ - 1; ++j) {
-                int bot_left = i * TOTAL_MINISQ + j;
+        for (int i = 0; i < MAX_VER_LINE - 1; ++i) {
+            for (int j = 0; j < MAX_VER_LINE - 1; ++j) {
+                int bot_left = i * MAX_VER_LINE + j;
                 int bot_right = bot_left + 1;
-                int top_left = bot_left + TOTAL_MINISQ;
+                int top_left = bot_left + MAX_VER_LINE;
                 int top_right = top_left + 1;
 
-                // First triangle
                 indices[index++] = bot_left;
-                indices[index++] = top_left;
                 indices[index++] = bot_right;
+                indices[index++] = top_left;
 
-                // Second triangle
-                indices[index++] = bot_right;
                 indices[index++] = top_left;
+                indices[index++] = bot_right;
                 indices[index++] = top_right;
+
             }
+        }
+        glm::vec3 temp_vec_A, temp_vec_B;
+        for (int i = 0; i < NUM_INDICES; i+=3){
+            //make a tri using index of indices 
+            unsigned short p0 = indices[i];
+            unsigned short p1 = indices[i+1];
+            unsigned short p2 = indices[i+2];
+            //make 2 vectors and cross pro gives normal ve of that area between two vector
+            temp_vec_A = vertices[p1].POS - vertices[p0].POS;
+            temp_vec_B = vertices[p2].POS - vertices[p0].POS;
+            glm::vec3 temp_normal = glm::vec3(0.0);
+            //a&b ko swap karke me normal ko negative kar sakta hu
+
+            temp_normal = glm::cross(temp_vec_A, temp_vec_B);
+            //add that normal vec to each vector
+            vertices[p0].NORMAL += temp_normal;
+            vertices[p1].NORMAL += temp_normal;
+            vertices[p2].NORMAL += temp_normal;
+        }
+
+        for (int i = 0; i < NUM_VERTICES; i++) {
+            //make unit vector
+            vertices[i].NORMAL = glm::normalize(vertices[i].NORMAL);
         }
         temp->Update(vertices, NUM_VERTICES, indices, NUM_INDICES);
         temp->send();
