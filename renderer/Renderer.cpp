@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-#include "src/Shader.h"
+#include "terrain/Terrain.h"
 #include "../Camera.h"
 
 
@@ -8,7 +8,6 @@
 #include <iostream>
 #include <glm/glm.hpp>
 
-#include "terrain/Terrain.h"
 //for running -temp
 
 
@@ -21,8 +20,14 @@ float Timer() {
 	lastTime = currtime;
 	return dt;
 }
+void checkError() {
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR) {
+		std::cout << err << "\n";
+	}
+}
 
-Renderer::Renderer(const int& width,const int& height, const char* winName):ACTIVE_SHADER(0),RENDER_DISTANCE(4){
+Renderer::Renderer(const int& width,const int& height, const char* winName):RENDER_DISTANCE(4){
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -55,33 +60,29 @@ Renderer::~Renderer()
 void Renderer::Run()
 {
 	float deltaTime;
-	Shader simple("renderer/src/shaders/vertex.glsl", "renderer/src/shaders/fragment.glsl");
+	bool firstrun = true;
+
 	
 
-	ACTIVE_SHADER = simple.Activate();
 
-
-	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT);
-	
+	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
 	Terrain basic;
-	simple.UpdateModelMatrix("ModelMatrix",basic.getModelMatrix());
 
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
-		//std::cout << 1.0/deltaTime << "\n";
+		std::cout << 1.0/deltaTime << "\n";
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
 		
-		cam.renderView(simple);
-		
-		basic.dynamicLoad(cam.giveCamChunk());
+		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk());
+		if (firstrun )checkError();
+		firstrun = false;
 			
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
 	}
 }
 

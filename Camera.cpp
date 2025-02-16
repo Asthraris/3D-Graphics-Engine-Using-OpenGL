@@ -5,6 +5,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 #define CHUNK_SIZE 8
 //for upadting matix
@@ -34,16 +35,16 @@ Camera::Camera(float fov, float near, float far, float Aspectrat) :
 
 Camera::~Camera()
 {
-
+	
 }
 
-void Camera::renderView(Shader& active){
+float* Camera::renderView(){
 	
 	VIEW_MAT = glm::mat4(1.0f);
 	VIEW_MAT = glm::lookAt(POSITION_VECTOR,POSITION_VECTOR+ FOCUS_VECTOR, UP_VECTOR);
 	VIEW_MAT = PERSPECTIVE_MAT * VIEW_MAT;
-	active.camMatrix(VIEW_MAT);
 	
+	return glm::value_ptr(VIEW_MAT);
 }
 
 void Camera::Move(const float deltaTime,GLFWwindow* window)

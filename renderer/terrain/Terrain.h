@@ -7,7 +7,7 @@
 #include <glad/glad.h>
 
 //utils
-
+#include "../src/Shader.h"
 #include "../vertex.h"
 #include "../../Shape.h"
 
@@ -42,13 +42,13 @@ class Terrain
 {
 private:
 	std::unordered_map<Grid, std::shared_ptr<Shape>, GridHash_ex> Map;
-	glm::mat4 Model_Matrix;
+	glm::mat4 MODEL_MATRIX;
+	Shader SHADER;
 	
 public:
 	Terrain();
 	~Terrain();
-	void dynamicLoad(glm::vec2 Cam_Chunk_Loc);
-	float* getModelMatrix();
+	void dynamicLoad(float* view_mat,glm::vec2 Cam_Chunk_Loc);
 
 };
 

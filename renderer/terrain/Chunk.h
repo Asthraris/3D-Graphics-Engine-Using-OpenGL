@@ -33,8 +33,8 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z) {
     VERTEX vertices[NUM_VERTICES];
     for (int i = 0; i < MAX_VER_LINE; ++i) {
         for (int j = 0; j < MAX_VER_LINE; ++j) {
-            float dx = (chunk_x * CHUNK_SIZE) + i ;
-            float dz = (chunk_z * CHUNK_SIZE) + j;
+            int dx = (chunk_x * CHUNK_SIZE) + i ;
+            int dz = (chunk_z * CHUNK_SIZE) + j;
             vertices[index].POS = glm::vec3(dx, genHeight(dx, dz, 8), dz);
             index++;
         }

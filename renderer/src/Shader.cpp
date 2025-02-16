@@ -6,7 +6,6 @@
 #include<sstream>
 
 //for cam matrix type converion
-#include<glm/gtc/type_ptr.hpp>
 
 //for error correction & handling
 #include <iostream>
@@ -30,6 +29,10 @@ void PrintError(unsigned int& vertId, unsigned int& fragId) {
 		glGetShaderInfoLog(fragId, length, &length, error);
 		std::cout << "FRAGMNET-Source-ERROR: " << error << "\n";
 	}
+}
+
+Shader::Shader()
+{
 }
 
 Shader::Shader(const char* Vertpath, const char* Fragpath){
@@ -85,24 +88,28 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 
 
 	CAMERA_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "camMatrix" );
+	MODEL_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "ModelMatrix");
 }
 
 Shader::~Shader(){
 	glDeleteProgram(PROGRAM_ID);
 }
 //kyuki me camera toh obviauslly banane wala hu so why not store the loc value in shader object
-void Shader::camMatrix(const glm::mat4& Value)
+void Shader::camMatrix(const float* Value)
 {
-	glUniformMatrix4fv(CAMERA_MAT_LOC, 1, GL_FALSE, glm::value_ptr(Value));
+	glUniformMatrix4fv(CAMERA_MAT_LOC, 1, GL_FALSE,Value);
 }
 
-void Shader::UpdateModelMatrix(const char* name, float* Value)
+void Shader::UpdateModelMatrix(const float* Value)
 {
-	glUniformMatrix4fv(glGetUniformLocation(PROGRAM_ID, name), 1, GL_FALSE, Value);
+	glUniformMatrix4fv(MODEL_MAT_LOC, 1, GL_FALSE, Value);
 }
 
-unsigned int Shader::Activate(){
+void Shader::Activate(){
 	glUseProgram(PROGRAM_ID);
+}
 
+unsigned int Shader::getProgram()
+{
 	return PROGRAM_ID;
 }

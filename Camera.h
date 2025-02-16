@@ -18,7 +18,7 @@ private:
 public:
 	Camera(float fov, float near,float far, float Aspectrat);
 	~Camera();
-	void renderView(Shader& active);
+	float* renderView();
 	void Move(const float deltaTime, GLFWwindow* window);
 	void Look(const float deltaTime, GLFWwindow* window);
 	glm::vec2 giveCamChunk();

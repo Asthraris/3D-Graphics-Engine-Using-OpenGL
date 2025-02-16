@@ -5,9 +5,8 @@
 #include <glm/glm.hpp>
 //utils
 
+
 //debug
-
-
 
 
 
@@ -17,7 +16,7 @@ private:
 	int WIN_WIDTH, WIN_HEIGHT;
 	GLFWwindow* window;
 	float SKY_COLOR[4] = {0.5,0.5,7.0,1.0};
-	unsigned int ACTIVE_SHADER;
+	
 	int RENDER_DISTANCE;
 
 public:

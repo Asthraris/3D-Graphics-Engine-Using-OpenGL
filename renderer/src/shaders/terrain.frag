@@ -1,10 +1,7 @@
-﻿#version 450 core
+#version 450 core
 out vec4 OUTPUT;
 
 in vec3 Normal;
-
-
-
 
 float Ambient(){
 	return 0.4;
@@ -22,8 +19,6 @@ vec3 rock = vec3(0.3,0.3,0.3);
 vec3 env = vec3(0.4, 0.1, 0.6);
 vec3 sunlight = vec3(1.0, 0.7, 0.3);
 vec3 sunrays = normalize(vec3(0.3, -0.4, -0.9));
-
-
 
 void main(){
 		vec3 normal = normalize(Normal);
