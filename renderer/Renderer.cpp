@@ -27,6 +27,28 @@ void checkError() {
 	}
 }
 
+// Callback function for keyboard input
+void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	static bool wire_frame = false;
+	static bool mouseHidden = false;
+	// Close window when ESC is pressed
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		glfwSetWindowShouldClose(window, true);
+	}
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS) {
+		wire_frame = !wire_frame;
+		glPolygonMode(GL_FRONT_AND_BACK, wire_frame ? GL_LINE : GL_FILL);
+		std::cout << "Wireframe Mode: " << (wire_frame ? "ON\n" : "OFF\n") ;
+	}
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS) {
+		mouseHidden = !mouseHidden;
+		glfwSetInputMode(window, GLFW_CURSOR, mouseHidden ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
+		std::cout << "Mouse Cursor: " << (mouseHidden ? "HIDDEN\n" : "VISIBLE\n");
+	}
+	
+
+}
+
 Renderer::Renderer(const int& width,const int& height, const char* winName):RENDER_DISTANCE(4){
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
@@ -65,19 +87,22 @@ void Renderer::Run()
 	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
 	Terrain basic;
 
+	//keyboard event listioner 
+	glfwSetKeyCallback(window, keyCallback);
 
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
-		//std::cout << 1.0/deltaTime << "\n";
+		std::cout << 1.0/deltaTime << "\n";
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
-		
-		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk());
+
 		//SLIDER DEBUG METER
 		if (firstrun )checkError();
 		firstrun = false;
 		//SLIDER DEBUG METER
+		
+		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk());
 
 			
 		glfwSwapBuffers(window);

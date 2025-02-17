@@ -4,20 +4,20 @@
 #include <glm/glm.hpp>
 #include <glad/glad.h>
 
-#include "renderer/vertex.h"
+#include "renderer/terrain/terrain_vertex.h"
 
 class Shape
 {
 private:
 	unsigned int VAO, VBO , EBO;
-	VERTEX* vertices;
+	terrain_VERTEX* vertices;
 	unsigned short* indices;
 	int num_verts;
 	int num_inds;
 public:
 	Shape();
 	~Shape();
-	void Update(VERTEX* vert,int nv,unsigned short* ind,int ni);
+	void Update(terrain_VERTEX* vert,int nv,unsigned short* ind,int ni);
 	void render();
 	void send();
 

@@ -1,25 +1,25 @@
 #pragma once
 
-#include <memory>
 #include <glm/glm.hpp>
 #include <glm/gtc/noise.hpp>
-#include "../vertex.h"
+#include "terrain_vertex.h"
 #include "../../Shape.h"
+#include <memory>
+
+//for dynamic vertex vector
+#include <vector>
+
 
 #define CHUNK_SIZE  8
-//MAX_VER_LINE = CHUNK_SIZE /VERTEX_DENSITY(1) +1
-#define  MAX_VER_LINE  9
-//NUM_VERTOCES = MAX_VER_LINE^2
-#define  NUM_VERTICES  81
-//NUM_indices = ((MAX_VER_LINE-1)^2) *6
-#define  NUM_INDICES  384  
+#define INDEX_PER_FACE 6
 
 
-float genHeight(float x, float z,const int octaves) {
+
+float genHeight(float x, float z,const int& PERLIN_DETAIL) {
     float Height = 0.0;
     float Amplitude = 10.0;
     float Frequency = 0.05;
-    for (int i = 0; i < octaves; i++) {
+    for (int i = 0; i < PERLIN_DETAIL; i++) {
         Height += glm::perlin(glm::vec2(x * Frequency, z * Frequency)) * Amplitude; // Scaled height
         Amplitude /= 8;
         Frequency *= 10;
@@ -27,25 +27,33 @@ float genHeight(float x, float z,const int octaves) {
     return Height;
 }
 
-std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z) {
-    int index = 0;
+std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const int LEVEL_OF_DETAIL,const int PERLIN_DETAIL ) {
+
     std::shared_ptr<Shape> temp = std::make_shared<Shape>();
-    VERTEX vertices[NUM_VERTICES];
-    for (int i = 0; i < MAX_VER_LINE; ++i) {
-        for (int j = 0; j < MAX_VER_LINE; ++j) {
-            int dx = (chunk_x * CHUNK_SIZE) + i ;
-            int dz = (chunk_z * CHUNK_SIZE) + j;
-            vertices[index].POS = glm::vec3(dx, genHeight(dx, dz, 8), dz);
+    //kyuki mene LOD introduce kiya toh numbers of vertex bhi dynamic hoga hence i need std::vector instead of array
+    std::vector <terrain_VERTEX> vertices;
+    const int MAX_VERTEX_PER_EDGE = (CHUNK_SIZE * LEVEL_OF_DETAIL) + 1;
+    vertices.resize(MAX_VERTEX_PER_EDGE*MAX_VERTEX_PER_EDGE);
+    int index = 0;
+
+    const float vertSteps = 1 / (float)LEVEL_OF_DETAIL;
+    for (int i = 0; i < MAX_VERTEX_PER_EDGE; ++i) {
+        for (int j = 0; j < MAX_VERTEX_PER_EDGE; ++j) {
+            float dx = (chunk_x * CHUNK_SIZE) + i * vertSteps ;
+            float dz = (chunk_z * CHUNK_SIZE) + j * vertSteps;
+            vertices[index].POS = glm::vec3(dx, genHeight(dx, dz, PERLIN_DETAIL), dz);
             index++;
         }
     }
-        unsigned short indices[NUM_INDICES];
-        index = 0;
-        for (int i = 0; i < MAX_VER_LINE - 1; ++i) {
-            for (int j = 0; j < MAX_VER_LINE - 1; ++j) {
-                int bot_left = i * MAX_VER_LINE + j;
+    std::vector <unsigned short>indices;
+    indices.resize((MAX_VERTEX_PER_EDGE - 1)*(MAX_VERTEX_PER_EDGE - 1)*INDEX_PER_FACE);
+    index = 0;
+    for (int i = 0; i < MAX_VERTEX_PER_EDGE - 1; ++i) {
+        for (int j = 0; j < MAX_VERTEX_PER_EDGE - 1; ++j) {
+
+                int bot_left = i * MAX_VERTEX_PER_EDGE + j;
                 int bot_right = bot_left + 1;
-                int top_left = bot_left + MAX_VER_LINE;
+                int top_left = bot_left + MAX_VERTEX_PER_EDGE;
                 int top_right = top_left + 1;
 
                 indices[index++] = bot_left;  // A
@@ -56,13 +64,10 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z) {
                 indices[index++] = bot_right; // C
                 indices[index++] = top_right; // D
 
-
-
-
-            }
         }
+    }
         glm::vec3 temp_vec_A, temp_vec_B;
-        for (int i = 0; i < NUM_INDICES; i+=3){
+        for (int i = 0; i < indices.size(); i+=3){
             //make a tri using index of indices 
             unsigned short p0 = indices[i];
             unsigned short p1 = indices[i+1];
@@ -80,11 +85,11 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z) {
             vertices[p2].NORMAL += temp_normal;
         }
 
-        for (int i = 0; i < NUM_VERTICES; i++) {
+        for (int i = 0; i < vertices.size(); i++) {
             //make unit vector
             vertices[i].NORMAL = glm::normalize(vertices[i].NORMAL);
         }
-        temp->Update(vertices, NUM_VERTICES, indices, NUM_INDICES);
+        temp->Update(vertices.data(), vertices.size(), indices.data(), indices.size());
         temp->send();
     return temp;
 }

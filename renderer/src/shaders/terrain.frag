@@ -14,7 +14,7 @@ float Diffuse(vec3 normal,vec3 lightdir){
 	return res;
 }
 
-vec3 grass = vec3(0.0,0.8,0.0);
+vec3 grass = vec3(0.0,0.6,0.0);
 vec3 rock = vec3(0.3,0.3,0.3);
 vec3 env = normalize(vec3(138, 141, 212));
 vec3 sunlight = vec3(1.0, 0.7, 0.3);
@@ -25,7 +25,7 @@ void main(){
 		float base = smoothstep(0.7,1.0,abs(normal.y));
 		vec3 terrainColor = mix(rock,grass,base);
 		
-		vec3 lightedArea = (Diffuse(normal,sunrays)*2)*sunlight;
+		vec3 lightedArea = (Diffuse(normal,sunrays)*4)*sunlight;
 		vec3 darkArea = (Ambient()*2)*env;
 
 		

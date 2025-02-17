@@ -17,7 +17,7 @@ Shape::~Shape()
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void Shape::Update(VERTEX* vert, int nv, unsigned short* ind, int ni)
+void Shape::Update(terrain_VERTEX* vert, int nv, unsigned short* ind, int ni)
 {
 	vertices = vert;
 	indices = ind;
@@ -37,19 +37,18 @@ void Shape::send()
 {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, num_verts * sizeof(VERTEX), vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, num_verts * sizeof(terrain_VERTEX), vertices, GL_STATIC_DRAW);
 
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, num_inds * sizeof(unsigned short), indices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VERTEX), (void*)offsetof(VERTEX, POS));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(terrain_VERTEX), (void*)offsetof(terrain_VERTEX, POS));
 	glEnableVertexAttribArray(0);
 
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VERTEX), (void*)offsetof(VERTEX, COLOR));
-	glEnableVertexAttribArray(1);
+	//abhi filhaal ke liye mene color ko implemant nhi kiya hai for terrain sinece i m dynamiccaly setting colour bahed on normal
 
-	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(VERTEX), (void*)offsetof(VERTEX, NORMAL));
-	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(terrain_VERTEX), (void*)offsetof(terrain_VERTEX, NORMAL));
+	glEnableVertexAttribArray(1);
 
 }

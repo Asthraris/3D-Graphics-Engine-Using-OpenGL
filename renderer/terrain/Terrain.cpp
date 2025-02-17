@@ -8,7 +8,9 @@
 
 #include "Chunk.h"
 
-#define RENDER_DIST 5
+#define RENDER_DIST 4
+#define LEVEL_OF_DETAIL 4
+#define PERLIN_OCTAVES 4
 
 Terrain::Terrain():SHADER("renderer/src/shaders/terrain.vert", "renderer/src/shaders/terrain.frag") {
 	
@@ -31,7 +33,7 @@ void Terrain::dynamicLoad(float* view_mat, glm::vec2 Cam_Chunk_Loc){
 		for (int y = Cam_Chunk_Loc.y - RENDER_DIST; y < Cam_Chunk_Loc.y + RENDER_DIST; y++) {
 			
 			if (Map[Grid(x, y)] == nullptr) {
-			    Map[Grid(x, y)] = generateChunk(x, y);  
+			    Map[Grid(x, y)] = generateChunk(x, y,LEVEL_OF_DETAIL,PERLIN_OCTAVES);  
 			}
 			Map[Grid(x, y)]->render();
 			
