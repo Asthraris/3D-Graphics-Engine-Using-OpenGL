@@ -45,8 +45,49 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		glfwSetInputMode(window, GLFW_CURSOR, mouseHidden ? GLFW_CURSOR_DISABLED : GLFW_CURSOR_NORMAL);
 		std::cout << "Mouse Cursor: " << (mouseHidden ? "HIDDEN\n" : "VISIBLE\n");
 	}
-	
+}
 
+
+void Renderer::IMGUI_INIT(GLFWwindow* window)
+{
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO& io = ImGui::GetIO();
+	(void)io;
+
+	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplOpenGL3_Init("#version 450");
+}
+
+void Renderer::IMGUI_RENDER()
+{
+	// Start the ImGui frame
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+
+	// Create your UI here
+	//idhar hamne ek window ka segment create kiyawith name this {if want to create more window seg. copy from this}
+	ImGui::Begin("3D Renderer By Aman Gupta!");
+	ImGui::Text("Sky-Color:");
+	ImGui::ColorEdit3("bg-Color", temp_SKY_COLOR);
+	ImGui::End();
+
+
+	// Render ImGui
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void Renderer::IMGUI_DESTROY(){
+	ImGui_ImplOpenGL3_Shutdown();
+	ImGui_ImplGlfw_Shutdown();
+	ImGui::DestroyContext();
+}
+
+bool Renderer::Compare_Sky_Color(const float main[3], const float change[3])
+{
+	return ((main[0] == change[0]) && (main[1] == change[1]) && (main[2] == change[2]));
 }
 
 Renderer::Renderer(const int& width,const int& height, const char* winName):RENDER_DISTANCE(4){
@@ -55,7 +96,6 @@ Renderer::Renderer(const int& width,const int& height, const char* winName):REND
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GLFW_TRUE);
 
 	WIN_WIDTH = width;
 	WIN_HEIGHT = height;
@@ -65,11 +105,11 @@ Renderer::Renderer(const int& width,const int& height, const char* winName):REND
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	//for 3d rendering
 	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
-	glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], SKY_COLOR[3]);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
+	IMGUI_INIT(window);
 	//making vertex as point  no fragment is running
 }
 
@@ -86,29 +126,35 @@ void Renderer::Run()
 
 	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
 	Terrain basic;
-
-	//keyboard event listioner 
+	//keyboard event listener 
 	glfwSetKeyCallback(window, keyCallback);
 
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
-		std::cout << 1.0/deltaTime << "\n";
+		//std::cout << 1.0/deltaTime << "\n";
+		if (!Compare_Sky_Color(SKY_COLOR, temp_SKY_COLOR)) {
+			for (int i = 0; i < 3; i++){
+				SKY_COLOR[i] = temp_SKY_COLOR[i];
+			}
+			glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0);
+		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
 
 		//SLIDER DEBUG METER
-		if (firstrun )checkError();
+		if (firstrun)checkError();
 		firstrun = false;
 		//SLIDER DEBUG METER
 		
 		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk());
 
-			
+		IMGUI_RENDER();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 	}
+	IMGUI_DESTROY();
 }
 
 

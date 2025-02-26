@@ -8,8 +8,8 @@
 
 #include "Chunk.h"
 
-#define RENDER_DIST 4
-#define LEVEL_OF_DETAIL 4
+#define RENDER_DIST 6
+#define LEVEL_OF_DETAIL 2
 #define PERLIN_OCTAVES 4
 
 Terrain::Terrain():SHADER("renderer/src/shaders/terrain.vert", "renderer/src/shaders/terrain.frag") {

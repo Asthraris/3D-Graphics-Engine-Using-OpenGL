@@ -63,7 +63,6 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const 
                 indices[index++] = top_left;  // B
                 indices[index++] = bot_right; // C
                 indices[index++] = top_right; // D
-
         }
     }
         glm::vec3 temp_vec_A, temp_vec_B;
