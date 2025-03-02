@@ -49,7 +49,7 @@ public:
 	Terrain();
 	Terrain(float seed);
 	~Terrain();
-	void dynamicLoad(float* view_mat,glm::vec2 Cam_Chunk_Loc, const int& RenderDistance, const int& TERR_LOD, const int& TERR_PER);
+	void dynamicLoad(float* view_mat,glm::vec2 Cam_Chunk_Loc,const int& NUM_LIGHTS, const int& RenderDistance, const int& TERR_LOD, const int& TERR_PER);
 
 };
 

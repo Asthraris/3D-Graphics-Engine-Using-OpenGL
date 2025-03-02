@@ -1,36 +1,62 @@
 #version 450 core
+#define MAX_LIGHTS 10
 out vec4 OUTPUT;
 
 in vec3 Normal;
+in vec3 fragPos;
 
-float Ambient(){
-	return 0.95;
-}
+struct light{
+	int Type;
+	vec3 Pos;
+	vec3 Color;
+	float Intensity;
+};
 
-float Diffuse(vec3 normal,vec3 lightdir){
-//yaha res neg bhi aata hai but we want res {0,1} hence max use kiya hai ,it will take max value amoung both value
+uniform int NUM_LIGHTS;
 
-	float res = max( dot(normal,lightdir), 0.0);
-	return res;
+layout(std140,binding=1)uniform LIGHTS{
+	light Lights[MAX_LIGHTS];
+};
+
+//filhaal ke liye specular light me nhi le raha hu
+vec3 CalcLighting(vec3 normal,vec3 fragPos){
+
+	vec3 result = vec3(0.0);
+
+	for(int i =0;i<NUM_LIGHTS;i++){
+		
+        if (Lights[i].Type == 1) {          // Directional light
+            vec3 lightDir = normalize(-Lights[i].Pos);
+            float diff = max(dot(normal, lightDir), 0.0);
+            result += Lights[i].Color * Lights[i].Intensity * diff;
+
+        } else {                           // Point light
+            vec3 lightDir = normalize(Lights[i].Pos - fragPos);
+            float diff = max(dot(normal, lightDir), 0.0);
+            float dist = length(Lights[i].Pos - fragPos);
+            float attenuation = 1.0 / (1.0 + 0.09 * dist + 0.032 * (dist * dist));
+            result += Lights[i].Color * Lights[i].Intensity * diff * attenuation;
+        }
+    }
+	return result;
 }
 
 vec3 grass = vec3(0.0,0.6,0.0);
 vec3 rock = vec3(0.3,0.3,0.3);
-vec3 env = normalize(vec3(138, 141, 212));
-vec3 sunlight = vec3(1.0, 0.7, 0.3);
-vec3 sunrays = normalize(vec3(0.3, -0.4, -0.9));
 
 void main(){
 		vec3 normal = normalize(Normal);
 		float base = smoothstep(0.7,1.0,abs(normal.y));
 		vec3 terrainColor = mix(rock,grass,base);
 		
-		vec3 lightedArea = (Diffuse(normal,sunrays)*4)*sunlight;
-		vec3 darkArea = (Ambient()*2)*env;
+		//vec3 litness = CalcLighting(normal,fragPos);
 
+		//vec3 final = terrainColor;
 		
-
-		vec3 final = (darkArea+lightedArea)*terrainColor;
-		
-		OUTPUT = vec4(final,1.0);
+		OUTPUT = vec4(terrainColor, 1.0);
 }
+
+
+
+
+

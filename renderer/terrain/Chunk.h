@@ -17,8 +17,8 @@
 
 float genHeight(float x, float z,const int& PERLIN_DETAIL) {
     float Height = 0.0;
-    float Amplitude = 10.0;
-    float Frequency = 0.05;
+    float Amplitude = 14.0;//INCREASE to MAKE more HEIGHT differnce in terrain
+    float Frequency = 0.02;//DECREASE to MAKE FLATTER TERRAIN
     for (int i = 0; i < PERLIN_DETAIL; i++) {
         Height += glm::perlin(glm::vec2(x * Frequency, z * Frequency)) * Amplitude; // Scaled height
         Amplitude /= 8;

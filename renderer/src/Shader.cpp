@@ -21,7 +21,7 @@ void PrintError(unsigned int& vertId, unsigned int& fragId) {
 		glGetShaderInfoLog(vertId, length, &length, error);
 		std::cout << "VERTEX-Source-ERROR: " << error << "\n";
 	}
-	glGetShaderiv(vertId, GL_COMPILE_STATUS, &Fragres);
+	glGetShaderiv(fragId, GL_COMPILE_STATUS, &Fragres);
 	if (Fragres == GL_FALSE) {
 		int length;
 		glGetShaderiv(fragId, GL_INFO_LOG_LENGTH, &length);
@@ -83,12 +83,28 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 	//links this exe's to program
 	glLinkProgram(PROGRAM_ID);
 
+
+	int linkStatus;
+	glGetProgramiv(PROGRAM_ID, GL_LINK_STATUS, &linkStatus);
+	if (linkStatus == GL_FALSE) {
+		int length;
+		glGetProgramiv(PROGRAM_ID, GL_INFO_LOG_LENGTH, &length);
+		char* error = (char*)malloc(length * sizeof(char));
+		glGetProgramInfoLog(PROGRAM_ID, length, &length, error);
+		std::cout << "SHADER LINKING ERROR: " << error << "\n";
+		free(error);
+	}
+
 	glDeleteShader(vertId);
 	glDeleteShader(fragId);
 
 
 	CAMERA_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "camMatrix" );
 	MODEL_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "ModelMatrix");
+	NUM_LIGHTS_LOC = glGetUniformLocation(PROGRAM_ID, "NUM_LIGHTS");
+
+	LIGHT_BLOCK_LOC = glGetUniformBlockIndex(PROGRAM_ID, "LIGHTS");
+	glUniformBlockBinding(PROGRAM_ID, LIGHT_BLOCK_LOC, 1);
 }
 
 Shader::~Shader(){
@@ -103,6 +119,11 @@ void Shader::camMatrix(const float* Value)
 void Shader::UpdateModelMatrix(const float* Value)
 {
 	glUniformMatrix4fv(MODEL_MAT_LOC, 1, GL_FALSE, Value);
+}
+
+void Shader::UpdateNUM_LIGHTS(const int& num_lights)
+{
+	glUniform1i(NUM_LIGHTS_LOC, num_lights);
 }
 
 void Shader::Activate(){

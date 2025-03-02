@@ -59,7 +59,7 @@ void Renderer::IMGUI_INIT(GLFWwindow* window)
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
-void Renderer::IMGUI_RENDER(const float&fps)
+void Renderer::IMGUI_RENDER()
 {
 	// Start the ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -118,6 +118,8 @@ Renderer::Renderer(const int& width,const int& height, const char* winName):REND
 
 	IMGUI_INIT(window);
 	//making vertex as point  no fragment is running
+
+	Ligthing = LightManager(5);
 }
 
 Renderer::~Renderer()
@@ -132,13 +134,18 @@ void Renderer::Run()
 	bool firstrun = true;
 
 	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
-	Terrain basic;
+
+	Terrain riverland;
+		//SLIDER DEBUG METER
+		if (firstrun)checkError();
+		firstrun = false;
+		//SLIDER DEBUG METER
 	//keyboard event listener 
 	glfwSetKeyCallback(window, keyCallback);
 
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
-		std::cout << 1.0/deltaTime << "\n";
+		//std::cout << 1.0/deltaTime << "\n";
 		if (!Compare_Sky_Color(SKY_COLOR, temp_SKY_COLOR)) {
 			for (int i = 0; i < 3; i++){
 				SKY_COLOR[i] = temp_SKY_COLOR[i];
@@ -148,15 +155,11 @@ void Renderer::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
-
-		//SLIDER DEBUG METER
-		if (firstrun)checkError();
-		firstrun = false;
-		//SLIDER DEBUG METER
 		
-		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk(),RENDER_DISTANCE,TERR_LOD,TERR_PER);
+		Ligthing.UpdateLights();
+		riverland.dynamicLoad(cam.renderView(),cam.giveCamChunk(),Ligthing.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
 
-		IMGUI_RENDER(1.0/deltaTime);
+		IMGUI_RENDER();
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
