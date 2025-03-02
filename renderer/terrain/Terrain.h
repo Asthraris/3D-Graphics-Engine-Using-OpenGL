@@ -44,11 +44,12 @@ private:
 	std::unordered_map<Grid, std::shared_ptr<Shape>, GridHash_ex> Map;
 	glm::mat4 MODEL_MATRIX;
 	Shader SHADER;
-	
+	float SEED;
 public:
 	Terrain();
+	Terrain(float seed);
 	~Terrain();
-	void dynamicLoad(float* view_mat,glm::vec2 Cam_Chunk_Loc);
+	void dynamicLoad(float* view_mat,glm::vec2 Cam_Chunk_Loc, const int& RenderDistance, const int& TERR_LOD, const int& TERR_PER);
 
 };
 

@@ -15,6 +15,7 @@ private:
 	int num_verts;
 	int num_inds;
 public:
+	int LOD,PERLIN;
 	Shape();
 	~Shape();
 	void Update(terrain_VERTEX* vert,int nv,unsigned short* ind,int ni);

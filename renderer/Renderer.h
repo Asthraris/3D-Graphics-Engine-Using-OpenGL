@@ -20,12 +20,13 @@ private:
 	int WIN_WIDTH, WIN_HEIGHT;
 	GLFWwindow* window;
 	float SKY_COLOR[3] = {0.0,0.0,0.0};
-	float temp_SKY_COLOR[3] = { 0.0,0.0,0.0 };
+	float temp_SKY_COLOR[3]= { 0.82,0.63,1.0 };
 	
 	int RENDER_DISTANCE;//ye implement krana baaki hai
+	int TERR_LOD, TERR_PER;
 
 	void IMGUI_INIT(GLFWwindow* window);
-	void IMGUI_RENDER();
+	void IMGUI_RENDER(const float& fps);
 	void IMGUI_DESTROY();
 
 

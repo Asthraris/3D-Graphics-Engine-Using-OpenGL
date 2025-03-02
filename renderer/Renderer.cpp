@@ -59,7 +59,7 @@ void Renderer::IMGUI_INIT(GLFWwindow* window)
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
-void Renderer::IMGUI_RENDER()
+void Renderer::IMGUI_RENDER(const float&fps)
 {
 	// Start the ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -69,8 +69,14 @@ void Renderer::IMGUI_RENDER()
 	// Create your UI here
 	//idhar hamne ek window ka segment create kiyawith name this {if want to create more window seg. copy from this}
 	ImGui::Begin("3D Renderer By Aman Gupta!");
-	ImGui::Text("Sky-Color:");
+	ImGui::Text("fps meter");
 	ImGui::ColorEdit3("bg-Color", temp_SKY_COLOR);
+	ImGui::Text("Render distance:");
+	ImGui::SliderInt("render", &RENDER_DISTANCE, 1, 10);
+	ImGui::SliderInt("LOD", &TERR_LOD, 1, 10);
+	ImGui::SliderInt("PERLIN", &TERR_PER, 1, 10);
+
+
 	ImGui::End();
 
 
@@ -90,7 +96,7 @@ bool Renderer::Compare_Sky_Color(const float main[3], const float change[3])
 	return ((main[0] == change[0]) && (main[1] == change[1]) && (main[2] == change[2]));
 }
 
-Renderer::Renderer(const int& width,const int& height, const char* winName):RENDER_DISTANCE(4){
+Renderer::Renderer(const int& width,const int& height, const char* winName):RENDER_DISTANCE(3),TERR_LOD(2),TERR_PER(4){
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -99,6 +105,7 @@ Renderer::Renderer(const int& width,const int& height, const char* winName):REND
 
 	WIN_WIDTH = width;
 	WIN_HEIGHT = height;
+	
 	window = glfwCreateWindow(WIN_WIDTH,WIN_HEIGHT,winName,nullptr,nullptr);
 	glfwMakeContextCurrent(window);
 	//glfw se humne glad procedure address liya fir typecast kiya to glad provided script then load kiya into glad
@@ -147,9 +154,9 @@ void Renderer::Run()
 		firstrun = false;
 		//SLIDER DEBUG METER
 		
-		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk());
+		basic.dynamicLoad(cam.renderView(),cam.giveCamChunk(),RENDER_DISTANCE,TERR_LOD,TERR_PER);
 
-		IMGUI_RENDER();
+		IMGUI_RENDER(1.0/deltaTime);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 

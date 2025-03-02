@@ -7,16 +7,21 @@
 
 
 #include "Chunk.h"
+#include "../RandomGenerator.h"
 
-#define RENDER_DIST 6
-#define LEVEL_OF_DETAIL 2
-#define PERLIN_OCTAVES 4
+
+
+
 
 Terrain::Terrain():SHADER("renderer/src/shaders/terrain.vert", "renderer/src/shaders/terrain.frag") {
 	
 	MODEL_MATRIX = glm::mat4(1.0f);
-	
+	//RandomGenerator rg;
+	//SEED = rg.getFloat(-1000.0,1000.0);
+	SEED = 0.0;
 }
+
+Terrain::Terrain(float seed):SEED(seed){}
 
 Terrain::~Terrain()
 {
@@ -24,16 +29,16 @@ Terrain::~Terrain()
 
 }
 
-void Terrain::dynamicLoad(float* view_mat, glm::vec2 Cam_Chunk_Loc){
+void Terrain::dynamicLoad(float* view_mat, glm::vec2 Cam_Chunk_Loc , const int& RenderDistance ,const int& TERR_LOD,const int& TERR_PER){
 	SHADER.Activate();
 	SHADER.camMatrix(view_mat);
 	SHADER.UpdateModelMatrix(glm::value_ptr(MODEL_MATRIX));
 
-	for (int x = Cam_Chunk_Loc.x - RENDER_DIST; x < Cam_Chunk_Loc.x + RENDER_DIST; x++) {
-		for (int y = Cam_Chunk_Loc.y - RENDER_DIST; y < Cam_Chunk_Loc.y + RENDER_DIST; y++) {
-			
-			if (Map[Grid(x, y)] == nullptr) {
-			    Map[Grid(x, y)] = generateChunk(x, y,LEVEL_OF_DETAIL,PERLIN_OCTAVES);  
+	for (int x = Cam_Chunk_Loc.x -  RenderDistance; x < Cam_Chunk_Loc.x + RenderDistance; x++) {
+		for (int y = Cam_Chunk_Loc.y - RenderDistance; y < Cam_Chunk_Loc.y + RenderDistance; y++) {
+			 
+			if (Map[Grid(x, y)] == nullptr || Map[Grid(x, y)]->LOD !=TERR_LOD || Map[Grid(x, y)]->PERLIN != TERR_PER) {
+			    Map[Grid(x, y)] = generateChunk(x, y,TERR_LOD,TERR_PER , SEED);  
 			}
 			Map[Grid(x, y)]->render();
 			

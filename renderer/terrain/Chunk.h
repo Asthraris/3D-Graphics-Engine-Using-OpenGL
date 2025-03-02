@@ -27,7 +27,7 @@ float genHeight(float x, float z,const int& PERLIN_DETAIL) {
     return Height;
 }
 
-std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const int LEVEL_OF_DETAIL,const int PERLIN_DETAIL ) {
+std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const int LEVEL_OF_DETAIL,const int PERLIN_DETAIL ,const float Seed) {
 
     std::shared_ptr<Shape> temp = std::make_shared<Shape>();
     //kyuki mene LOD introduce kiya toh numbers of vertex bhi dynamic hoga hence i need std::vector instead of array
@@ -39,8 +39,8 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const 
     const float vertSteps = 1 / (float)LEVEL_OF_DETAIL;
     for (int i = 0; i < MAX_VERTEX_PER_EDGE; ++i) {
         for (int j = 0; j < MAX_VERTEX_PER_EDGE; ++j) {
-            float dx = (chunk_x * CHUNK_SIZE) + i * vertSteps ;
-            float dz = (chunk_z * CHUNK_SIZE) + j * vertSteps;
+            float dx = (chunk_x * CHUNK_SIZE) + i * vertSteps +Seed;
+            float dz = (chunk_z * CHUNK_SIZE) + j * vertSteps +Seed;
             vertices[index].POS = glm::vec3(dx, genHeight(dx, dz, PERLIN_DETAIL), dz);
             index++;
         }
@@ -88,6 +88,8 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const 
             //make unit vector
             vertices[i].NORMAL = glm::normalize(vertices[i].NORMAL);
         }
+        temp->LOD = LEVEL_OF_DETAIL;
+        temp->PERLIN = PERLIN_DETAIL;
         temp->Update(vertices.data(), vertices.size(), indices.data(), indices.size());
         temp->send();
     return temp;
