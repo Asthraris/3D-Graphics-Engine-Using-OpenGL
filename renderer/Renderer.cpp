@@ -138,7 +138,7 @@ void Renderer::Run()
 
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
-		//std::cout << 1.0/deltaTime << "\n";
+		std::cout << 1.0/deltaTime << "\n";
 		if (!Compare_Sky_Color(SKY_COLOR, temp_SKY_COLOR)) {
 			for (int i = 0; i < 3; i++){
 				SKY_COLOR[i] = temp_SKY_COLOR[i];
