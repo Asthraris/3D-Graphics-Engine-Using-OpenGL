@@ -16,9 +16,9 @@
 Terrain::Terrain():SHADER("renderer/src/shaders/terrain.vert", "renderer/src/shaders/terrain.frag") {
 	
 	MODEL_MATRIX = glm::mat4(1.0f);
-	//RandomGenerator rg;
-	//SEED = rg.getFloat(-1000.0,1000.0);
-	SEED = 0.0;
+	RandomGenerator rg;
+	SEED = rg.getFloat(-1000.0,1000.0);
+	//SEED = 0.0;
 }
 
 Terrain::Terrain(float seed):SEED(seed){}
