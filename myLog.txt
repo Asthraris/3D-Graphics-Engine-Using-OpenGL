@@ -1,0 +1,8 @@
+
+
+TIME WASTED - 2 days
+while installing Lightness class
+my terrain become complete black , when i made it shader ptr then invoke constructor using new keyowd it worked until then when activating shader gave 1281 error
+
+TIME WASTED - LATEST
+LIGHT increase to 1 but there is not light effect shown in output

@@ -23,7 +23,7 @@ float Timer() {
 void checkError() {
 	GLenum err = glGetError();
 	if (err != GL_NO_ERROR) {
-		std::cout << err << "\n";
+		std::cout << "RENDERER-SLIDER ERROR: " << err << "\n";
 	}
 }
 
@@ -136,13 +136,18 @@ void Renderer::Run()
 	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
 
 	Terrain riverland;
-		//SLIDER DEBUG METER
-		if (firstrun)checkError();
-		firstrun = false;
-		//SLIDER DEBUG METER
 	//keyboard event listener 
 	glfwSetKeyCallback(window, keyCallback);
 
+	light dirLight = {
+	0,
+	glm::vec3(-0.5f, -1.0f, -0.3f),
+	glm::vec3(1.0f, 1.0f, 0.0f),
+	1.0f
+	};
+
+	Ligthing.AddLight(dirLight);
+	
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
 		//std::cout << 1.0/deltaTime << "\n";
@@ -155,9 +160,18 @@ void Renderer::Run()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
+
+		if(temp_LIGHT_NUM != Ligthing.NUM_LIGHTS){
+			Ligthing.UpdateLights();
+			temp_LIGHT_NUM = Ligthing.NUM_LIGHTS;
+		}
 		
-		Ligthing.UpdateLights();
 		riverland.dynamicLoad(cam.renderView(),cam.giveCamChunk(),Ligthing.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
+
+		//SLIDER DEBUG METER
+		if (firstrun)checkError();
+		firstrun = false;
+		//SLIDER DEBUG METER
 
 		IMGUI_RENDER();
 		glfwSwapBuffers(window);

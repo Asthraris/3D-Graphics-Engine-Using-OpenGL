@@ -10,24 +10,16 @@
 //for error correction & handling
 #include <iostream>
 
-void PrintError(unsigned int& vertId, unsigned int& fragId) {
+void PrintError(unsigned int& souceId ) {
 
-	int Vertres, Fragres;
-	glGetShaderiv(vertId, GL_COMPILE_STATUS, &Vertres);
-	if (Vertres == GL_FALSE) {
+	int result;
+	glGetShaderiv(souceId, GL_COMPILE_STATUS, &result);
+	if (result == GL_FALSE) {
 		int length;
-		glGetShaderiv(vertId, GL_INFO_LOG_LENGTH, &length);
+		glGetShaderiv(souceId, GL_INFO_LOG_LENGTH, &length);
 		char* error = (char*)malloc(length * sizeof(char));
-		glGetShaderInfoLog(vertId, length, &length, error);
-		std::cout << "VERTEX-Source-ERROR: " << error << "\n";
-	}
-	glGetShaderiv(fragId, GL_COMPILE_STATUS, &Fragres);
-	if (Fragres == GL_FALSE) {
-		int length;
-		glGetShaderiv(fragId, GL_INFO_LOG_LENGTH, &length);
-		char* error = (char*)malloc(length * sizeof(char));
-		glGetShaderInfoLog(fragId, length, &length, error);
-		std::cout << "FRAGMNET-Source-ERROR: " << error << "\n";
+		glGetShaderInfoLog(souceId, length, &length, error);
+		std::cout << "Source-ERROR: " << error << "\n";
 	}
 }
 
@@ -67,12 +59,13 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 		glShaderSource(vertId, 1, &vertstr, nullptr);
 		//creates an executable file for gpu to execute
 		glCompileShader(vertId);
+		PrintError(vertId);
 
 		fragId = glCreateShader(GL_FRAGMENT_SHADER);
 		glShaderSource(fragId, 1, &fragstr, nullptr);
 		glCompileShader(fragId);
 
-		PrintError(vertId, fragId);
+		PrintError(fragId);
 	}
 
 	PROGRAM_ID = glCreateProgram();
@@ -84,27 +77,27 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 	glLinkProgram(PROGRAM_ID);
 
 
-	int linkStatus;
-	glGetProgramiv(PROGRAM_ID, GL_LINK_STATUS, &linkStatus);
-	if (linkStatus == GL_FALSE) {
-		int length;
-		glGetProgramiv(PROGRAM_ID, GL_INFO_LOG_LENGTH, &length);
-		char* error = (char*)malloc(length * sizeof(char));
-		glGetProgramInfoLog(PROGRAM_ID, length, &length, error);
-		std::cout << "SHADER LINKING ERROR: " << error << "\n";
-		free(error);
-	}
+	
 
 	glDeleteShader(vertId);
 	glDeleteShader(fragId);
 
-
+	glUseProgram(PROGRAM_ID);
 	CAMERA_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "camMatrix" );
-	MODEL_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "ModelMatrix");
+	if (CAMERA_MAT_LOC == -1)std::cout << " CAmeranot found\n";
+
+	MODEL_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "Model_Matrix");
+	if (MODEL_MAT_LOC == -1)std::cout << " MOdel not found\n";
+
 	NUM_LIGHTS_LOC = glGetUniformLocation(PROGRAM_ID, "NUM_LIGHTS");
+	if (NUM_LIGHTS_LOC == -1)std::cout << " NUM_lightnot found\n";
+
 
 	LIGHT_BLOCK_LOC = glGetUniformBlockIndex(PROGRAM_ID, "LIGHTS");
-	glUniformBlockBinding(PROGRAM_ID, LIGHT_BLOCK_LOC, 1);
+	glUniformBlockBinding(PROGRAM_ID, LIGHT_BLOCK_LOC, 0);
+	if (LIGHT_BLOCK_LOC == -1)std::cout << "LIGHts block not found\n";
+
+	glUseProgram(0);
 }
 
 Shader::~Shader(){

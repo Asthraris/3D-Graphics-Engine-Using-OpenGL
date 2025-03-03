@@ -43,7 +43,7 @@ class Terrain
 private:
 	std::unordered_map<Grid, std::shared_ptr<Shape>, GridHash_ex> Map;
 	glm::mat4 MODEL_MATRIX;
-	Shader SHADER;
+	Shader* SHADER;
 	float SEED;
 public:
 	Terrain();

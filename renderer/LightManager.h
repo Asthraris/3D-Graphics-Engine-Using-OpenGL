@@ -25,8 +25,8 @@ public:
 	int NUM_LIGHTS;
 	LightManager();
 	LightManager(int maxLIGHT);
-	void AddLight(const light& LIGHT);
-	void removeLight();
+	int AddLight(const light& LIGHT);
+	int removeLight();
 
 	void UpdateLights();
 };

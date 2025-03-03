@@ -13,8 +13,10 @@ struct light{
 };
 
 uniform int NUM_LIGHTS;
+//make it uniform
+float DARKNESS = 0.3;
 
-layout(std140,binding=1)uniform LIGHTS{
+layout(std140,binding=0)uniform LIGHTS{
 	light Lights[MAX_LIGHTS];
 };
 
@@ -25,8 +27,8 @@ vec3 CalcLighting(vec3 normal,vec3 fragPos){
 
 	for(int i =0;i<NUM_LIGHTS;i++){
 		
-        if (Lights[i].Type == 1) {          // Directional light
-            vec3 lightDir = normalize(-Lights[i].Pos);
+        if (Lights[i].Type == 0) {          // Directional light
+            vec3 lightDir = normalize(Lights[i].Pos);
             float diff = max(dot(normal, lightDir), 0.0);
             result += Lights[i].Color * Lights[i].Intensity * diff;
 
@@ -38,7 +40,7 @@ vec3 CalcLighting(vec3 normal,vec3 fragPos){
             result += Lights[i].Color * Lights[i].Intensity * diff * attenuation;
         }
     }
-	return result;
+	return max(result,DARKNESS);
 }
 
 vec3 grass = vec3(0.0,0.6,0.0);
@@ -49,11 +51,11 @@ void main(){
 		float base = smoothstep(0.7,1.0,abs(normal.y));
 		vec3 terrainColor = mix(rock,grass,base);
 		
-		//vec3 litness = CalcLighting(normal,fragPos);
+		vec3 litness = CalcLighting(normal,fragPos);
 
-		//vec3 final = terrainColor;
+		vec3 final = litness * terrainColor;
 		
-		OUTPUT = vec4(terrainColor, 1.0);
+		OUTPUT = vec4(final, 1.0);
 }
 
 
