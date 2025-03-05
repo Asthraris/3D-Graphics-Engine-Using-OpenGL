@@ -5,14 +5,22 @@ out vec4 OUTPUT;
 in vec3 Normal;
 in vec3 fragPos;
 
-struct light{
-	int Type;
-	vec3 Pos;
-	vec3 Color;
-	float Intensity;
+struct light {
+    int Type;//16 byte
+
+    vec3 Pos;
+    float padding1;   // Add padding to match std140 alignment  in std140 vec3 aligns same data as vec4=16bytes hence i added padding of 4bit float next to it to make 16 bit after 12 bit vec3
+    //16byte
+
+    vec3 Color;
+    float padding2;   // Add padding for the next vec3
+    //16byte
+
+    float Intensity; //16  byte
 };
 
-uniform int NUM_LIGHTS;
+
+uniform int NUM_LIGHTS ;
 //make it uniform
 float DARKNESS = 0.3;
 
@@ -25,7 +33,7 @@ vec3 CalcLighting(vec3 normal,vec3 fragPos){
 
 	vec3 result = vec3(0.0);
 
-	for(int i =0;i<NUM_LIGHTS;i++){
+	for(int i =0;i<NUM_LIGHTS;i=i+1){
 		
         if (Lights[i].Type == 0) {          // Directional light
             vec3 lightDir = normalize(Lights[i].Pos);
@@ -40,7 +48,7 @@ vec3 CalcLighting(vec3 normal,vec3 fragPos){
             result += Lights[i].Color * Lights[i].Intensity * diff * attenuation;
         }
     }
-	return max(result,DARKNESS);
+	return result;
 }
 
 vec3 grass = vec3(0.0,0.6,0.0);
@@ -55,7 +63,11 @@ void main(){
 
 		vec3 final = litness * terrainColor;
 		
-		OUTPUT = vec4(final, 1.0);
+        OUTPUT = vec4(final,1.0);
+
+
+
+
 }
 
 

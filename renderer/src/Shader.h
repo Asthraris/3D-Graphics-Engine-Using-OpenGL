@@ -16,7 +16,7 @@ public:
 	~Shader();
 	void camMatrix(const float* Value);
 	void UpdateModelMatrix(const float* Value);
-	void UpdateNUM_LIGHTS(const int& num_lights);
+	void UpdateNUM_LIGHTS(const int num_lights);
 	void Activate();
 	unsigned int getProgram();
 };

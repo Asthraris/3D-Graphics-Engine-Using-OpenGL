@@ -141,12 +141,18 @@ void Renderer::Run()
 
 	light dirLight = {
 	0,
-	glm::vec3(-0.5f, -1.0f, -0.3f),
+	glm::vec3(0.8f, 1.0f, 0.0f),
 	glm::vec3(1.0f, 1.0f, 0.0f),
 	1.0f
 	};
 
 	Ligthing.AddLight(dirLight);
+	Ligthing.UpdateLights();
+		//SLIDER DEBUG METER
+		if (firstrun)checkError();
+		firstrun = false;
+		//SLIDER DEBUG METER
+	
 	
 	while (!glfwWindowShouldClose(window)) {
 		deltaTime = Timer();
@@ -161,17 +167,11 @@ void Renderer::Run()
 		cam.Move(deltaTime, window);
 		cam.Look(deltaTime, window);
 
-		if(temp_LIGHT_NUM != Ligthing.NUM_LIGHTS){
-			Ligthing.UpdateLights();
-			temp_LIGHT_NUM = Ligthing.NUM_LIGHTS;
-		}
+			
+		
 		
 		riverland.dynamicLoad(cam.renderView(),cam.giveCamChunk(),Ligthing.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
 
-		//SLIDER DEBUG METER
-		if (firstrun)checkError();
-		firstrun = false;
-		//SLIDER DEBUG METER
 
 		IMGUI_RENDER();
 		glfwSwapBuffers(window);

@@ -43,8 +43,6 @@ void Terrain::dynamicLoad(float* view_mat, glm::vec2 Cam_Chunk_Loc , const int& 
 	SHADER->UpdateNUM_LIGHTS(NUM_LIGHTS);
 
 
-
-
 	for (int x = Cam_Chunk_Loc.x -  RenderDistance; x < Cam_Chunk_Loc.x + RenderDistance; x++) {
 		for (int y = Cam_Chunk_Loc.y - RenderDistance; y < Cam_Chunk_Loc.y + RenderDistance; y++) {
 			 
