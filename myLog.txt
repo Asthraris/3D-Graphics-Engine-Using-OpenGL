@@ -1,12 +1,16 @@
 
 
-TIME WASTED - 2 days
+	TIME WASTED - 2 days
 while installing Lightness class
 my terrain become complete black , when i made it shader ptr then invoke constructor using new keyowd it worked until then when activating shader gave 1281 error
 
-TIME WASTED - 2 days
+	TIME WASTED - 2 days
 LIGHT increase to 1 but there is not light effect shown in output
 
-TIME WASTED - 1 days
+	TIME WASTED - 1 days
 GLSL std140 saves data in 16 bit format total object takes 64 bytes hence i added padding to adjust that
 learned alignas(BYTESIZE) in cpp which determines the layout of the data in bytes used in struct
+
+	TIME UTELIZED -1 day 
+ADDED Light manager which is altered using the Imgui its its working compleatly best :{}}]
+Updating the light uniform block every frame takes away 400 fPS which is quite much 

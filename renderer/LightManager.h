@@ -4,10 +4,10 @@
 #include <glm/glm.hpp>
 
 struct light {
-	alignas(16) int Type;
-	alignas(16) glm::vec3 Pos;
-	alignas(16) glm::vec3 Color;
-	alignas(16) float Intensity;
+	alignas(16) int Type =0;
+	alignas(16) glm::vec3 Pos =glm::vec3(0.0);
+	alignas(16) glm::vec3 Color = glm::vec3(1.0);
+	alignas(16) float Intensity = 0.5;
 };
 
 
@@ -22,12 +22,13 @@ private:
 	void DEB_printLight();
 
 public:
-	int NUM_LIGHTS;
+	int NUM_LIGHTS =0;
 	LightManager();
 	LightManager(int maxLIGHT);
-	int AddLight(const light& LIGHT);
-	int removeLight();
+	void AddLight(const light& LIGHT);
+	void removeLight();
 
 	void UpdateLights();
+	void IMGUI_RENDER();
 };
 

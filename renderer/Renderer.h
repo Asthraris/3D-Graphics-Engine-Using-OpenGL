@@ -28,10 +28,10 @@ private:
 	int RENDER_DISTANCE;//ye implement krana baaki hai
 	int TERR_LOD, TERR_PER;
 
-	LightManager Ligthing;
+	LightManager Aura;
 	
 	void IMGUI_INIT(GLFWwindow* window);
-	void IMGUI_RENDER();
+	void IMGUI_RENDER(int fps);
 	void IMGUI_DESTROY();
 
 

@@ -59,7 +59,7 @@ void Renderer::IMGUI_INIT(GLFWwindow* window)
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
-void Renderer::IMGUI_RENDER()
+void Renderer::IMGUI_RENDER(int fps)
 {
 	// Start the ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -69,16 +69,20 @@ void Renderer::IMGUI_RENDER()
 	// Create your UI here
 	//idhar hamne ek window ka segment create kiyawith name this {if want to create more window seg. copy from this}
 	ImGui::Begin("3D Renderer By Aman Gupta!");
-	ImGui::Text("fps meter");
+	ImGui::Text("fps meter: %d",fps);
 	ImGui::ColorEdit3("bg-Color", temp_SKY_COLOR);
 	ImGui::Text("Render distance:");
 	ImGui::SliderInt("render", &RENDER_DISTANCE, 1, 10);
 	ImGui::SliderInt("LOD", &TERR_LOD, 1, 10);
 	ImGui::SliderInt("PERLIN", &TERR_PER, 1, 10);
+	
+
+
 
 
 	ImGui::End();
 
+	Aura.IMGUI_RENDER();
 
 	// Render ImGui
 	ImGui::Render();
@@ -119,11 +123,12 @@ Renderer::Renderer(const int& width,const int& height, const char* winName):REND
 	IMGUI_INIT(window);
 	//making vertex as point  no fragment is running
 
-	Ligthing = LightManager(5);
+	Aura = LightManager(3);
 }
 
 Renderer::~Renderer()
 {
+	IMGUI_DESTROY();
 	glfwDestroyWindow(window);
 	glfwTerminate();
 }
@@ -139,15 +144,7 @@ void Renderer::Run()
 	//keyboard event listener 
 	glfwSetKeyCallback(window, keyCallback);
 
-	light dirLight = {
-	0,
-	glm::vec3(0.8f, 1.0f, 0.0f),
-	glm::vec3(1.0f, 1.0f, 0.0f),
-	1.0f
-	};
-
-	Ligthing.AddLight(dirLight);
-	Ligthing.UpdateLights();
+	
 		//SLIDER DEBUG METER
 		if (firstrun)checkError();
 		firstrun = false;
@@ -170,15 +167,13 @@ void Renderer::Run()
 			
 		
 		
-		riverland.dynamicLoad(cam.renderView(),cam.giveCamChunk(),Ligthing.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
+		riverland.dynamicLoad(cam.renderView(),cam.giveCamChunk(),Aura.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
 
-
-		IMGUI_RENDER();
+		IMGUI_RENDER(int(1/deltaTime));
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
 	}
-	IMGUI_DESTROY();
 }
 
 
