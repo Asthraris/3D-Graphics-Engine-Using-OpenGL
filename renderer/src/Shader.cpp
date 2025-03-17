@@ -95,14 +95,14 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 	NUM_LIGHTS_LOC = glGetUniformLocation(PROGRAM_ID, "NUM_LIGHTS");
 	if (NUM_LIGHTS_LOC == -1)std::cout << " NUM_lightnot found\n";
 	
-
-	LIGHT_BLOCK_LOC = glGetUniformBlockIndex(PROGRAM_ID, "LIGHTS");
-	glUniformBlockBinding(PROGRAM_ID, LIGHT_BLOCK_LOC, 0);
-	if (LIGHT_BLOCK_LOC == -1)std::cout << "LIGHts block not found\n";
-
 	CONFIG_BLOCK_LOC = glGetUniformBlockIndex(PROGRAM_ID, "SETTINGS");
 	glUniformBlockBinding(PROGRAM_ID, CONFIG_BLOCK_LOC, 0);
 	if (CONFIG_BLOCK_LOC == -1)std::cout << "Config block not found\n";
+
+	LIGHT_BLOCK_LOC = glGetUniformBlockIndex(PROGRAM_ID, "LIGHTS");
+	glUniformBlockBinding(PROGRAM_ID, LIGHT_BLOCK_LOC, 1);
+	if (LIGHT_BLOCK_LOC == -1)std::cout << "LIGHts block not found\n";
+
 
 	glUseProgram(0);
 }

@@ -32,7 +32,7 @@ float fogDensity = 0.05;
 
 float DARKNESS = 0.3;
 
-layout(std140,binding=1)uniform SETTINGS{
+layout(std140,binding=0)uniform SETTINGS{
     bool fog_enable ;
 	float fog_density ;
 	vec3 fog_color ;
@@ -41,7 +41,7 @@ layout(std140,binding=1)uniform SETTINGS{
 	bool light_enable ;
 };
 
-layout(std140,binding=0)uniform LIGHTS{
+layout(std140,binding=1)uniform LIGHTS{
 	light Lights[MAX_LIGHTS];
 };
 
