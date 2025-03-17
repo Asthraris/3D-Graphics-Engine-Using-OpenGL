@@ -14,3 +14,6 @@ learned alignas(BYTESIZE) in cpp which determines the layout of the data in byte
 	TIME UTELIZED -1 day 
 ADDED Light manager which is altered using the Imgui its its working compleatly best :{}}]
 Updating the light uniform block every frame takes away 400 fPS which is quite much 
+
+
+calibrate details about perlin octaves 

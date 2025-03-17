@@ -32,6 +32,14 @@ float fogDensity = 0.05;
 
 float DARKNESS = 0.3;
 
+layout(std140,binding=1)uniform SETTINGS{
+    bool fog_enable ;
+	float fog_density ;
+	vec3 fog_color ;
+	float ambient;
+	int num_lights ;
+	bool light_enable ;
+};
 
 layout(std140,binding=0)uniform LIGHTS{
 	light Lights[MAX_LIGHTS];
@@ -71,16 +79,21 @@ vec3 CalcFoginess(vec3 Base,float depth){
 
 void main(){
 
-		vec3 normal = normalize(Normal);
-		float base = smoothstep(0.7,1.0,abs(normal.y));
-		vec3 terrainColor = mix(rock,grass,base);
-		
+	vec3 normal = normalize(Normal);
+
+	float base = smoothstep(0.7,1.0,abs(normal.y));
+	vec3 final = mix(rock,grass,base);
+
+	if(light_enable==true){
 		vec3 litness = CalcLighting(normal,fragPos);
+		final = litness * final;
+    }
 
-		vec3 lited_bg = litness * terrainColor;
+    if(fog_enable==true){
+	    final = CalcFoginess(final,ViewDepth);
+    }
 
-		vec3 final = CalcFoginess(lited_bg,ViewDepth);
-        OUTPUT = vec4(final,1.0);
+    OUTPUT = vec4(final,1.0);
 
 }
 

@@ -11,6 +11,8 @@
 //for running -temp
 
 
+
+
 //problem ye aati thi ke func ke ander mai jo bhi obj banata tha ur uska reference kahinour ano.func me use karta tha tab tak destruct call hojata tha clearing that obj only pointer me adrress hota tha but not pointer 
 //c/cpp me ye detect bhi nhi hota kyuki jo new address aata tha usse c typecast kardeta tha without checking the validity of that obj 
 float Timer() {
@@ -48,14 +50,14 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 
-void Renderer::IMGUI_INIT(GLFWwindow* window)
+void Renderer::IMGUI_INIT(GLFWwindow* window_ptr)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
 	(void)io;
 
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
+	ImGui_ImplGlfw_InitForOpenGL(window_ptr, true);
 	ImGui_ImplOpenGL3_Init("#version 450");
 }
 
@@ -70,11 +72,22 @@ void Renderer::IMGUI_RENDER(int fps)
 	//idhar hamne ek window ka segment create kiyawith name this {if want to create more window seg. copy from this}
 	ImGui::Begin("3D Renderer By Aman Gupta!");
 	ImGui::Text("fps meter: %d",fps);
-	ImGui::ColorEdit3("bg-Color", temp_SKY_COLOR);
+	ImGui::ColorEdit3("bg-Color", settings.sky);
 	ImGui::Text("Render distance:");
-	ImGui::SliderInt("render", &RENDER_DISTANCE, 1, 10);
-	ImGui::SliderInt("LOD", &TERR_LOD, 1, 10);
-	ImGui::SliderInt("PERLIN", &TERR_PER, 1, 10);
+	ImGui::SliderInt("render", &settings.render_distance, 1, 10);
+	ImGui::SliderInt("LOD", &settings.level_of_detail, 1, 10);
+	ImGui::Text("ENVIORNMENT");
+	ImGui::Checkbox("Enable Fog", &settings.env.fog_enable);
+	if (settings.env.fog_enable) {
+		ImGui::ColorEdit3("Fog Color", settings.env.fog_color);
+		ImGui::SliderFloat("Fog Density", &settings.env.fog_density, 0.0f, 1.0f);
+	}
+
+	ImGui::SliderFloat("Ambient Light", &settings.env.ambient, 0.0f, 1.0f);
+
+	ImGui::SliderInt("Number of Lights", &settings.env.num_lights, 0, 10);
+	ImGui::Checkbox("Enable Lighting", &settings.env.light_enable);
+	//ImGui::SliderInt("PERLIN", &TERR_PER, 1, 10);
 	
 
 
@@ -95,32 +108,28 @@ void Renderer::IMGUI_DESTROY(){
 	ImGui::DestroyContext();
 }
 
-bool Renderer::Compare_Sky_Color(const float main[3], const float change[3])
-{
-	return ((main[0] == change[0]) && (main[1] == change[1]) && (main[2] == change[2]));
-}
-
-Renderer::Renderer(const int& width,const int& height, const char* winName):RENDER_DISTANCE(3),TERR_LOD(2),TERR_PER(4){
+Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	WIN_WIDTH = width;
-	WIN_HEIGHT = height;
 	
-	window = glfwCreateWindow(WIN_WIDTH,WIN_HEIGHT,winName,nullptr,nullptr);
-	glfwMakeContextCurrent(window);
+	win->construct();
+	
+	
+	glfwMakeContextCurrent(win->ptr);
 	//glfw se humne glad procedure address liya fir typecast kiya to glad provided script then load kiya into glad
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	//for 3d rendering
-	glViewport(0, 0, WIN_WIDTH, WIN_HEIGHT);
+	glViewport(0, 0, win->width, win->height);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	IMGUI_INIT(window);
+	settings = CONFIG(lvl);
+	IMGUI_INIT(win->ptr);
 	//making vertex as point  no fragment is running
 
 	Aura = LightManager(3);
@@ -129,48 +138,45 @@ Renderer::Renderer(const int& width,const int& height, const char* winName):REND
 Renderer::~Renderer()
 {
 	IMGUI_DESTROY();
-	glfwDestroyWindow(window);
+	glfwDestroyWindow(win->ptr);
 	glfwTerminate();
 }
 
 void Renderer::Run()
 {
 	float deltaTime;
-	bool firstrun = true;
+	bool DEBUGfirstrun = true;
 
-	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
+	Camera cam(60.0f, 0.1f, 100.0f, float(win->width) / (float)win->height );
 
 	Terrain riverland;
 		//SLIDER DEBUG METER
-		if (firstrun)checkError();
-		firstrun = false;
+		if (DEBUGfirstrun)checkError();
+		DEBUGfirstrun = false;
 		//SLIDER DEBUG METER
 	//keyboard event listener 
-	glfwSetKeyCallback(window, keyCallback);
+	glfwSetKeyCallback(win->ptr, keyCallback);
 
 	
 	
 	
-	while (!glfwWindowShouldClose(window)) {
+	while (!glfwWindowShouldClose(win->ptr)) {
 		deltaTime = Timer();
 		//std::cout << 1.0/deltaTime << "\n";
-		if (!Compare_Sky_Color(SKY_COLOR, temp_SKY_COLOR)) {
-			for (int i = 0; i < 3; i++){
-				SKY_COLOR[i] = temp_SKY_COLOR[i];
-			}
-			glClearColor(SKY_COLOR[0], SKY_COLOR[1], SKY_COLOR[2], 1.0);
-		}
+		settings.check4Change();
+		glClearColor(settings.sky[0], settings.sky[1], settings.sky[2], 1.0);
+		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		cam.Move(deltaTime, window);
-		cam.Look(deltaTime, window);
+		cam.Move(deltaTime, win->ptr);
+		cam.Look(deltaTime, win->ptr);
 
 			
 		
 		
-		riverland.dynamicLoad(cam, Aura.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
+		riverland.dynamicLoad(cam, Aura.NUM_LIGHTS, settings.render_distance, settings.level_of_detail);
 
 		IMGUI_RENDER(int(1/deltaTime));
-		glfwSwapBuffers(window);
+		glfwSwapBuffers(win->ptr);
 		glfwPollEvents();
 
 	}

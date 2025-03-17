@@ -100,6 +100,10 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 	glUniformBlockBinding(PROGRAM_ID, LIGHT_BLOCK_LOC, 0);
 	if (LIGHT_BLOCK_LOC == -1)std::cout << "LIGHts block not found\n";
 
+	CONFIG_BLOCK_LOC = glGetUniformBlockIndex(PROGRAM_ID, "SETTINGS");
+	glUniformBlockBinding(PROGRAM_ID, CONFIG_BLOCK_LOC, 0);
+	if (CONFIG_BLOCK_LOC == -1)std::cout << "Config block not found\n";
+
 	glUseProgram(0);
 }
 

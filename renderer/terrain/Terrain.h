@@ -45,12 +45,13 @@ private:
 	std::unordered_map<Grid, std::shared_ptr<Shape>, GridHash_ex> Map;
 	glm::mat4 MODEL_MATRIX;
 	Shader* SHADER;
+	int BUBBLES = 8;
 	float SEED;
 public:
 	Terrain();
 	Terrain(float seed);
 	~Terrain();
-	void dynamicLoad(Camera& cam,const int& NUM_LIGHTS, const int& RenderDistance, const int& TERR_LOD, const int& TERR_PER);
+	void dynamicLoad(Camera& cam,const int& NUM_LIGHTS, const int& RenderDistance, const int& TERR_LOD);
 
 };
 

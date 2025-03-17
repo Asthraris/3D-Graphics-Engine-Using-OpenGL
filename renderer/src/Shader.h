@@ -11,6 +11,8 @@ private:
 	int MODEL_MAT_LOC;
 	int NUM_LIGHTS_LOC;
 	unsigned int LIGHT_BLOCK_LOC;
+	unsigned int CONFIG_BLOCK_LOC;
+
 public:
 	Shader();
 	Shader(const char* Vertpath,const char* Fragpath);

@@ -33,10 +33,9 @@ Terrain::Terrain(float seed):SEED(seed){
 Terrain::~Terrain()
 {
 	Map.clear();
-
 }
 
-void Terrain::dynamicLoad(Camera& cam, const int& NUM_LIGHTS, const int& RenderDistance ,const int& TERR_LOD,const int& TERR_PER){
+void Terrain::dynamicLoad(Camera& cam, const int& NUM_LIGHTS, const int& RenderDistance ,const int& TERR_LOD){
 
 	SHADER->Activate();
 	SHADER->viewMatrix(cam.renderView());
@@ -48,8 +47,8 @@ void Terrain::dynamicLoad(Camera& cam, const int& NUM_LIGHTS, const int& RenderD
 	for (int x = Curr_Chunk.x -  RenderDistance; x < Curr_Chunk.x + RenderDistance; x++) {
 		for (int y = Curr_Chunk.y - RenderDistance; y < Curr_Chunk.y + RenderDistance; y++) {
 			 
-			if (Map[Grid(x, y)] == nullptr || Map[Grid(x, y)]->LOD !=TERR_LOD || Map[Grid(x, y)]->PERLIN != TERR_PER) {
-			    Map[Grid(x, y)] = generateChunk(x, y,TERR_LOD,TERR_PER , SEED);  
+			if (Map[Grid(x, y)] == nullptr || Map[Grid(x, y)]->LOD !=TERR_LOD ) {
+			    Map[Grid(x, y)] = generateChunk(x, y,TERR_LOD,BUBBLES , SEED);  
 			}
 			Map[Grid(x, y)]->render();
 			
