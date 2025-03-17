@@ -5,7 +5,6 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #define CHUNK_SIZE 8
 //for upadting matix
@@ -42,7 +41,6 @@ float* Camera::renderView(){
 	
 	VIEW_MAT = glm::mat4(1.0f);
 	VIEW_MAT = glm::lookAt(POSITION_VECTOR,POSITION_VECTOR+ FOCUS_VECTOR, UP_VECTOR);
-	VIEW_MAT = PERSPECTIVE_MAT * VIEW_MAT;
 	
 	return glm::value_ptr(VIEW_MAT);
 }
@@ -117,6 +115,11 @@ void Camera::Look(const float deltaTime, GLFWwindow* window) {
 	// Update the last mouse position
 	lastMousePos_X = currMousePos_X;
 	lastMousePos_Y = currMousePos_Y;
+}
+
+float* Camera::getProjMatrix()
+{
+	return glm::value_ptr(PERSPECTIVE_MAT);
 }
 
 glm::vec2 Camera::giveCamChunk(){

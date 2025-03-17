@@ -83,8 +83,11 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 	glDeleteShader(fragId);
 
 	glUseProgram(PROGRAM_ID);
-	CAMERA_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "camMatrix" );
-	if (CAMERA_MAT_LOC == -1)std::cout << " CAmeranot found\n";
+	VIEW_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "View_Matrix" );
+	if (VIEW_MAT_LOC == -1)std::cout << " View not found\n";
+
+	PROJ_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "Proj_Matrix");
+	if (PROJ_MAT_LOC == -1)std::cout << " PERS not found\n";
 
 	MODEL_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "Model_Matrix");
 	if (MODEL_MAT_LOC == -1)std::cout << " MOdel not found\n";
@@ -104,10 +107,14 @@ Shader::~Shader(){
 	glUseProgram(0);
 	glDeleteProgram(PROGRAM_ID);
 }
-//kyuki me camera toh obviauslly banane wala hu so why not store the loc value in shader object
-void Shader::camMatrix(const float* Value)
+void Shader::projMatrix(const float* Value)
 {
-	glUniformMatrix4fv(CAMERA_MAT_LOC, 1, GL_FALSE,Value);
+	glUniformMatrix4fv(PROJ_MAT_LOC, 1, GL_FALSE, Value);
+}
+//kyuki me camera toh obviauslly banane wala hu so why not store the loc value in shader object
+void Shader::viewMatrix(const float* Value)
+{
+	glUniformMatrix4fv(VIEW_MAT_LOC, 1, GL_FALSE,Value);
 }
 
 void Shader::UpdateModelMatrix(const float* Value)

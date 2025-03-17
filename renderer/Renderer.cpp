@@ -141,14 +141,14 @@ void Renderer::Run()
 	Camera cam(60.0f, 0.1f, 100.0f, float(WIN_WIDTH) / (float)WIN_HEIGHT );
 
 	Terrain riverland;
-	//keyboard event listener 
-	glfwSetKeyCallback(window, keyCallback);
-
-	
 		//SLIDER DEBUG METER
 		if (firstrun)checkError();
 		firstrun = false;
 		//SLIDER DEBUG METER
+	//keyboard event listener 
+	glfwSetKeyCallback(window, keyCallback);
+
+	
 	
 	
 	while (!glfwWindowShouldClose(window)) {
@@ -167,7 +167,7 @@ void Renderer::Run()
 			
 		
 		
-		riverland.dynamicLoad(cam.renderView(),cam.giveCamChunk(),Aura.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
+		riverland.dynamicLoad(cam, Aura.NUM_LIGHTS, RENDER_DISTANCE, TERR_LOD, TERR_PER);
 
 		IMGUI_RENDER(int(1/deltaTime));
 		glfwSwapBuffers(window);

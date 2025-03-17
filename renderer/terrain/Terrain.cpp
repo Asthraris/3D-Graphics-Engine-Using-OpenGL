@@ -22,6 +22,7 @@ Terrain::Terrain(){
 	MODEL_MATRIX = glm::mat4(1.0f);
 	RandomGenerator rg;
 	SEED = rg.getFloat(-1000.0,1000.0);
+
 }
 
 Terrain::Terrain(float seed):SEED(seed){
@@ -35,16 +36,17 @@ Terrain::~Terrain()
 
 }
 
-void Terrain::dynamicLoad(float* view_mat, glm::vec2 Cam_Chunk_Loc , const int& NUM_LIGHTS, const int& RenderDistance ,const int& TERR_LOD,const int& TERR_PER){
+void Terrain::dynamicLoad(Camera& cam, const int& NUM_LIGHTS, const int& RenderDistance ,const int& TERR_LOD,const int& TERR_PER){
 
 	SHADER->Activate();
-	SHADER->camMatrix(view_mat);
+	SHADER->viewMatrix(cam.renderView());
 	SHADER->UpdateModelMatrix(glm::value_ptr(MODEL_MATRIX));
+	SHADER->projMatrix(cam.getProjMatrix());
 	SHADER->UpdateNUM_LIGHTS(NUM_LIGHTS);
+	glm::vec2 Curr_Chunk = cam.giveCamChunk();
 
-
-	for (int x = Cam_Chunk_Loc.x -  RenderDistance; x < Cam_Chunk_Loc.x + RenderDistance; x++) {
-		for (int y = Cam_Chunk_Loc.y - RenderDistance; y < Cam_Chunk_Loc.y + RenderDistance; y++) {
+	for (int x = Curr_Chunk.x -  RenderDistance; x < Curr_Chunk.x + RenderDistance; x++) {
+		for (int y = Curr_Chunk.y - RenderDistance; y < Curr_Chunk.y + RenderDistance; y++) {
 			 
 			if (Map[Grid(x, y)] == nullptr || Map[Grid(x, y)]->LOD !=TERR_LOD || Map[Grid(x, y)]->PERLIN != TERR_PER) {
 			    Map[Grid(x, y)] = generateChunk(x, y,TERR_LOD,TERR_PER , SEED);  

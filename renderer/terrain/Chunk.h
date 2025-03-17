@@ -10,7 +10,7 @@
 #include <vector>
 
 
-#define CHUNK_SIZE  8
+#define CHUNK_SIZE  16
 #define INDEX_PER_FACE 6
 
 

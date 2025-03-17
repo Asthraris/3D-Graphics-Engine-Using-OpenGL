@@ -4,6 +4,7 @@ out vec4 OUTPUT;
 
 in vec3 Normal;
 in vec3 fragPos;
+in float ViewDepth;
 
 struct light {
     int Type;//16 byte
@@ -21,8 +22,16 @@ struct light {
 
 
 uniform int NUM_LIGHTS ;
+
 //make it uniform
+vec3 grass = vec3(0.0,0.6,0.0);
+vec3 rock = vec3(0.3,0.3,0.3);
+
+vec3 fog = vec3(0.5,0.5,0.5);
+float fogDensity = 0.05;
+
 float DARKNESS = 0.3;
+
 
 layout(std140,binding=0)uniform LIGHTS{
 	light Lights[MAX_LIGHTS];
@@ -51,22 +60,27 @@ vec3 CalcLighting(vec3 normal,vec3 fragPos){
 	return result;
 }
 
-vec3 grass = vec3(0.0,0.6,0.0);
-vec3 rock = vec3(0.3,0.3,0.3);
+vec3 CalcFoginess(vec3 Base,float depth){
+    float fogfactor = exp(-fogDensity * depth);
+    fogfactor = clamp(fogfactor,0.0,1.0);
+    vec3 result = mix(fog,Base,fogfactor);
+    return result;
+}
+
+
 
 void main(){
+
 		vec3 normal = normalize(Normal);
 		float base = smoothstep(0.7,1.0,abs(normal.y));
 		vec3 terrainColor = mix(rock,grass,base);
 		
 		vec3 litness = CalcLighting(normal,fragPos);
 
-		vec3 final = litness * terrainColor;
-		
+		vec3 lited_bg = litness * terrainColor;
+
+		vec3 final = CalcFoginess(lited_bg,ViewDepth);
         OUTPUT = vec4(final,1.0);
-
-
-
 
 }
 

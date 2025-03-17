@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 
 #include <GLFW/glfw3.h>
 #include "renderer/src/Shader.h"
@@ -21,6 +23,7 @@ public:
 	float* renderView();
 	void Move(const float deltaTime, GLFWwindow* window);
 	void Look(const float deltaTime, GLFWwindow* window);
+	float* getProjMatrix();
 	glm::vec2 giveCamChunk();
 
 };
