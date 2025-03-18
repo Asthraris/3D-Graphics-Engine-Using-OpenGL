@@ -1,5 +1,5 @@
 #version 450 core
-#define MAX_LIGHTS 10
+#define MAX_LIGHTS 30
 out vec4 OUTPUT;
 
 in vec3 Normal;
@@ -27,21 +27,16 @@ uniform int NUM_LIGHTS ;
 vec3 grass = vec3(0.0,0.6,0.0);
 vec3 rock = vec3(0.3,0.3,0.3);
 
-vec3 fog = vec3(0.5,0.5,0.5);
-float fogDensity = 0.05;
 
-float DARKNESS = 0.3;
-
-layout(std140,binding=0)uniform SETTINGS{
+layout(std140,binding=1)uniform SETTINGS{
+	float ambient;
+	bool light_enable ;
     bool fog_enable ;
 	float fog_density ;
 	vec3 fog_color ;
-	float ambient;
-	int num_lights ;
-	bool light_enable ;
 };
 
-layout(std140,binding=1)uniform LIGHTS{
+layout(std140,binding=0)uniform LIGHTS{
 	light Lights[MAX_LIGHTS];
 };
 
@@ -69,9 +64,9 @@ vec3 CalcLighting(vec3 normal,vec3 fragPos){
 }
 
 vec3 CalcFoginess(vec3 Base,float depth){
-    float fogfactor = exp(-fogDensity * depth);
+    float fogfactor = exp(-fog_density * depth);
     fogfactor = clamp(fogfactor,0.0,1.0);
-    vec3 result = mix(fog,Base,fogfactor);
+    vec3 result = mix(fog_color,Base,fogfactor);
     return result;
 }
 
@@ -84,16 +79,15 @@ void main(){
 	float base = smoothstep(0.7,1.0,abs(normal.y));
 	vec3 final = mix(rock,grass,base);
 
-	if(light_enable==true){
+	if(light_enable){
 		vec3 litness = CalcLighting(normal,fragPos);
 		final = litness * final;
     }
 
-    if(fog_enable==true){
+    if(fog_enable){
 	    final = CalcFoginess(final,ViewDepth);
     }
-
-    OUTPUT = vec4(final,1.0);
+    OUTPUT =vec4(final,1.0); 
 
 }
 

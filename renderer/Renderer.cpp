@@ -77,16 +77,15 @@ void Renderer::IMGUI_RENDER(int fps)
 	ImGui::SliderInt("render", &settings.render_distance, 1, 10);
 	ImGui::SliderInt("LOD", &settings.level_of_detail, 1, 10);
 	ImGui::Text("ENVIORNMENT");
+	ImGui::SliderFloat("Ambient Light", &settings.env.ambient, 0.0f, 1.0f);
+	ImGui::Checkbox("Enable Lighting", &settings.env.light_enable);
 	ImGui::Checkbox("Enable Fog", &settings.env.fog_enable);
 	if (settings.env.fog_enable) {
 		ImGui::ColorEdit3("Fog Color", settings.env.fog_color);
 		ImGui::SliderFloat("Fog Density", &settings.env.fog_density, 0.0f, 1.0f);
 	}
 
-	ImGui::SliderFloat("Ambient Light", &settings.env.ambient, 0.0f, 1.0f);
 
-	ImGui::SliderInt("Number of Lights", &settings.env.num_lights, 0, 10);
-	ImGui::Checkbox("Enable Lighting", &settings.env.light_enable);
 	//ImGui::SliderInt("PERLIN", &TERR_PER, 1, 10);
 	
 
@@ -128,10 +127,10 @@ Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
-	settings = CONFIG(lvl);
 	IMGUI_INIT(win->ptr);
 	//making vertex as point  no fragment is running
 
+	settings = CONFIG(lvl);
 	Aura = LightManager(3);
 }
 
