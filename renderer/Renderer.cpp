@@ -12,7 +12,6 @@
 
 
 
-
 //problem ye aati thi ke func ke ander mai jo bhi obj banata tha ur uska reference kahinour ano.func me use karta tha tab tak destruct call hojata tha clearing that obj only pointer me adrress hota tha but not pointer 
 //c/cpp me ye detect bhi nhi hota kyuki jo new address aata tha usse c typecast kardeta tha without checking the validity of that obj 
 float Timer() {
@@ -78,12 +77,12 @@ void Renderer::IMGUI_RENDER(int fps)
 	ImGui::SliderInt("LOD", &settings.level_of_detail, 1, 10);
 	ImGui::Text("ENVIORNMENT");
 	ImGui::SliderFloat("Ambient Light", &settings.env.ambient, 0.0f, 1.0f);
-	ImGui::Checkbox("Enable Lighting", &settings.env.light_enable);
-	ImGui::Checkbox("Enable Fog", &settings.env.fog_enable);
-	if (settings.env.fog_enable) {
-		ImGui::ColorEdit3("Fog Color", settings.env.fog_color);
-		ImGui::SliderFloat("Fog Density", &settings.env.fog_density, 0.0f, 1.0f);
-	}
+	ImGui::Checkbox("Enable Lighting", (bool*)&settings.env.light_enable);
+	ImGui::Checkbox("Enable Fog", (bool*)&settings.env.fog_enable);
+	
+	ImGui::ColorEdit3("Fog Color", &settings.env.fog_color.x);
+	ImGui::SliderFloat("Fog Density", &settings.env.fog_density, 0.0f, 0.5f);
+	
 
 
 	//ImGui::SliderInt("PERLIN", &TERR_PER, 1, 10);
@@ -149,10 +148,6 @@ void Renderer::Run()
 	Camera cam(60.0f, 0.1f, 100.0f, float(win->width) / (float)win->height );
 
 	Terrain riverland;
-		//SLIDER DEBUG METER
-		if (DEBUGfirstrun)checkError();
-		DEBUGfirstrun = false;
-		//SLIDER DEBUG METER
 	//keyboard event listener 
 	glfwSetKeyCallback(win->ptr, keyCallback);
 
@@ -176,7 +171,13 @@ void Renderer::Run()
 
 		IMGUI_RENDER(int(1/deltaTime));
 		glfwSwapBuffers(win->ptr);
+
 		glfwPollEvents();
+
+		//SLIDER DEBUG METER
+		if (DEBUGfirstrun)checkError();
+		DEBUGfirstrun = false;
+		//SLIDER DEBUG METER
 
 	}
 }

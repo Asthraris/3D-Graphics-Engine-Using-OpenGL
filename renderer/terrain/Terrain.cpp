@@ -19,7 +19,7 @@
 
 Terrain::Terrain(){
 	SHADER =  new Shader("renderer/src/shaders/terrain.vert", "renderer/src/shaders/terrain.frag");
-	MODEL_MATRIX = glm::mat4(1.0f);
+
 	RandomGenerator rg;
 	SEED = rg.getFloat(-1000.0,1000.0);
 
@@ -27,7 +27,7 @@ Terrain::Terrain(){
 
 Terrain::Terrain(float seed):SEED(seed){
 	SHADER = new Shader("renderer/src/shaders/terrain.vert", "renderer/src/shaders/terrain.frag");
-	MODEL_MATRIX = glm::mat4(1.0f);
+	
 }
 
 Terrain::~Terrain()
@@ -39,7 +39,7 @@ void Terrain::dynamicLoad(Camera& cam, const int& NUM_LIGHTS, const int& RenderD
 
 	SHADER->Activate();
 	SHADER->viewMatrix(cam.renderView());
-	SHADER->UpdateModelMatrix(glm::value_ptr(MODEL_MATRIX));
+	SHADER->UpdateModelMatrix(trans->getMat());
 	SHADER->projMatrix(cam.getProjMatrix());
 	SHADER->UpdateNUM_LIGHTS(NUM_LIGHTS);
 	glm::vec2 Curr_Chunk = cam.giveCamChunk();

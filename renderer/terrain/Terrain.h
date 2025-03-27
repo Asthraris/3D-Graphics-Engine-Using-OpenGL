@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <functional>//for std::hash
 #include <memory>
-#include <glm/glm.hpp>
+
 #include <glad/glad.h>
 
 //utils
@@ -11,6 +11,7 @@
 #include "../vertex.h"
 #include "../../Shape.h"
 #include "../../Camera.h"
+#include "../Transformation.h"
 
 /*
 Environment	vec3 Base Color (RGB)	Description
@@ -43,7 +44,7 @@ class Terrain
 {
 private:
 	std::unordered_map<Grid, std::shared_ptr<Shape>, GridHash_ex> Map;
-	glm::mat4 MODEL_MATRIX;
+	std::unique_ptr<Transformation> trans = std::make_unique<Transformation>();
 	Shader* SHADER;
 	int BUBBLES = 8;
 	float SEED;

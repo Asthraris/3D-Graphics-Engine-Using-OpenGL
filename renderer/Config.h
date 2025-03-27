@@ -12,13 +12,12 @@ enum LEVEL {
 	unity = 1,
 	godot =2
 };
-
 struct envConfigUniform {
-	float ambient =0.0;
-	alignas(4) bool light_enable = 1;
-	alignas(4) bool fog_enable = 1;
-	float fog_density =0.05;
-	alignas(16) float fog_color[3] = {1.0, 1.0, 1.0};
+	float ambient = 0.0;               // 4 bytes
+	int light_enable =1;            // 4 bytes (use int instead of bool)
+	int fog_enable =1;              // 4 bytes (use int instead of bool)
+	float fog_density = 0.005;           // 4 bytes
+	alignas(16) glm::vec3 fog_color = glm::vec3(1.0);
 
 	bool operator==(const envConfigUniform& other) const {
 		return fog_enable == other.fog_enable &&
@@ -58,6 +57,7 @@ public:
 		}
 
 		//generating the uniform layout for storing setting data gpu ke liye
+		
 		glGenBuffers(1, &configUBO);
 		glBindBuffer(GL_UNIFORM_BUFFER, configUBO);
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(envConfigUniform), &env, GL_DYNAMIC_DRAW);
@@ -72,7 +72,7 @@ public:
 			glBindBuffer(GL_UNIFORM_BUFFER, configUBO);
 			glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(envConfigUniform), &GpuSidedata);
 			glBindBuffer(GL_UNIFORM_BUFFER, 0);
-			DEBUGprintUBOData();
+			//DEBUGprintUBOData();
 		}
 	}
 	void DEBUGprintUBOData() {
