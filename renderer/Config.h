@@ -39,6 +39,7 @@ public:
 	float sky[3] = {0.0,0.0,0.0};
 	int render_distance;
 	int level_of_detail;
+	float Gravity = 10.0;
 	CONFIG() {};
 	CONFIG(LEVEL lvl) {
 		switch (lvl)

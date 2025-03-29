@@ -4,16 +4,25 @@
 Transformation::Transformation()
 {
 	Model = glm::mat4(1.0f);
+	m_position = glm::vec3(0.0);
+}
+
+void Transformation::set_Model(const glm::mat4& temp)
+{
+	Model = temp;
 }
 
 
+
 void Transformation::transform(glm::vec3 update){
-	Model = glm::translate(glm::mat4(1.0f), update);
+	m_position = update;
+	Model = glm::translate(glm::mat4(1.0f), m_position);
 }
 
 void Transformation::move(glm::vec3 update)
 {
-	Model = glm::translate(Model, update);
+	m_position += update;
+	Model = glm::translate(Model, m_position);
 }
 
 void Transformation::enlarge(float size){
