@@ -27,9 +27,9 @@ float genHeight(float x, float z,const int& PERLIN_DETAIL) {
     return Height;
 }
 
-std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const int LEVEL_OF_DETAIL,const int PERLIN_DETAIL ,const float Seed) {
+std::shared_ptr<Terrain_Shape> generateChunk(const int chunk_x,const int chunk_z ,const int LEVEL_OF_DETAIL,const int PERLIN_DETAIL ,const float Seed) {
 
-    std::shared_ptr<Shape> temp = std::make_shared<Shape>();
+    std::shared_ptr<Terrain_Shape> temp = std::make_shared<Terrain_Shape>();
     //kyuki mene LOD introduce kiya toh numbers of vertex bhi dynamic hoga hence i need std::vector instead of array
     std::vector <terrain_VERTEX> vertices;
     const int MAX_VERTEX_PER_EDGE = (CHUNK_SIZE * LEVEL_OF_DETAIL) + 1;
@@ -89,7 +89,6 @@ std::shared_ptr<Shape> generateChunk(const int chunk_x,const int chunk_z ,const 
             vertices[i].NORMAL = glm::normalize(vertices[i].NORMAL);
         }
         temp->LOD = LEVEL_OF_DETAIL;
-        temp->PERLIN = PERLIN_DETAIL;
         temp->Update(vertices.data(), vertices.size(), indices.data(), indices.size());
         temp->send();
     return temp;

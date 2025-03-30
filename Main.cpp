@@ -16,3 +16,12 @@ int main() {
 	Sigma.Run();
 	return 0;
 }
+
+
+//mene Shape.h ko alter kiya hai beacuse i need upgrading it for generatal shape not optinum for terrain now 
+//so Terrain ke liye bhi karna hoga 
+//abhi ke liye terrain work nahi hoga
+
+
+//v2
+/* ABHI ke liye me Shape data ko bhi include kar raha hu but baadme me shared ptr use karna chata hu to store similar shape point in one data Shape agar kuch naya shape hoga then i would provide an otion ko create an new Shape*/

@@ -7,8 +7,8 @@ private:
 	glm::mat4 Model;
 	glm::vec3 m_position;
 public:
-	Transformation();
-	void set_Model(const glm::mat4& temp);
+	Transformation(const glm::mat4& temp );
+	
 	void transform(glm::vec3);
 	void move(glm::vec3);
 	void enlarge(float);

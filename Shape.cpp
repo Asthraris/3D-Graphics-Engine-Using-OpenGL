@@ -3,21 +3,21 @@
 
 #include <iostream>
 
-Shape::Shape():num_verts(0),num_inds(0)
+Terrain_Shape::Terrain_Shape():num_verts(0),num_inds(0)
 {
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
 	glGenBuffers(1, &EBO);
 }
 
-Shape::~Shape()
+Terrain_Shape::~Terrain_Shape()
 {
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
 	glDeleteVertexArrays(1, &VAO);
 }
 
-void Shape::Update(terrain_VERTEX* vert, int nv, unsigned short* ind, int ni)
+void Terrain_Shape::Update(terrain_VERTEX* vert, int nv, unsigned short* ind, int ni)
 {
 	vertices = vert;
 	indices = ind;
@@ -26,14 +26,14 @@ void Shape::Update(terrain_VERTEX* vert, int nv, unsigned short* ind, int ni)
 }
 
 
-void Shape::render()
+void Terrain_Shape::render()
 {
 	glBindVertexArray(VAO);
 	//glDrawArrays(GL_TRIANGLES, 0, num_verts);
 	glDrawElements(GL_TRIANGLES, num_inds, GL_UNSIGNED_SHORT, nullptr);
 }
 
-void Shape::send()
+void Terrain_Shape::send()
 {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);

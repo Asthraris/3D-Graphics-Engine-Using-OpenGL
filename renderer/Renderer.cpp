@@ -147,7 +147,7 @@ void Renderer::Run()
 
 	Camera cam(60.0f, 0.1f, 100.0f, float(win->width) / (float)win->height );
 
-	Terrain riverland;
+	//Terrain riverland;
 	//keyboard event listener 
 	glfwSetKeyCallback(win->ptr, keyCallback);
 
@@ -167,7 +167,7 @@ void Renderer::Run()
 			
 		
 		
-		riverland.dynamicLoad(cam, Aura.NUM_LIGHTS, settings.render_distance, settings.level_of_detail);
+		//riverland.dynamicLoad(cam, Aura.NUM_LIGHTS, settings.render_distance, settings.level_of_detail);
 
 		IMGUI_RENDER(int(1/deltaTime));
 		glfwSwapBuffers(win->ptr);

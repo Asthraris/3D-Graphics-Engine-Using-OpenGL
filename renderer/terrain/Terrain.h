@@ -8,20 +8,10 @@
 
 //utils
 #include "../src/Shader.h"
-#include "../vertex.h"
 #include "../../Shape.h"
 #include "../../Camera.h"
 #include "../Transformation.h"
 
-/*
-Environment	vec3 Base Color (RGB)	Description
-
-Grassland	vec3(0.1, 0.5, 0.1)	Natural green
-Desert		vec3(0.9, 0.7, 0.3)	Sand color
-Snowy		vec3(0.9, 0.9, 0.9)	White snow
-Rocky		vec3(0.5, 0.5, 0.5)	Gray stone
-Volcanic	vec3(0.2, 0.1, 0.1)	Dark lava rock
-*/
 
 
 struct Grid {
@@ -43,7 +33,7 @@ struct GridHash_ex {
 class Terrain
 {
 private:
-	std::unordered_map<Grid, std::shared_ptr<Shape>, GridHash_ex> Map;
+	std::unordered_map<Grid, std::shared_ptr<Terrain_Shape>, GridHash_ex> Map;
 	std::unique_ptr<Transformation> trans = std::make_unique<Transformation>();
 	Shader* SHADER;
 	int BUBBLES = 8;

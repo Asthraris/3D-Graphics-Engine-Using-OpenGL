@@ -23,11 +23,7 @@ class Renderer
 private:
 	std::unique_ptr<WINDOW> win;
 	CONFIG settings;
-
-	int temp_LIGHT_NUM =0;
-
 	LightManager Aura;
-	
 	void IMGUI_INIT(GLFWwindow*);
 	void IMGUI_RENDER(int);
 	void IMGUI_DESTROY();

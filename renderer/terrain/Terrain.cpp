@@ -46,7 +46,7 @@ void Terrain::dynamicLoad(Camera& cam, const int& NUM_LIGHTS, const int& RenderD
 
 	for (int x = Curr_Chunk.x -  RenderDistance; x < Curr_Chunk.x + RenderDistance; x++) {
 		for (int y = Curr_Chunk.y - RenderDistance; y < Curr_Chunk.y + RenderDistance; y++) {
-			 
+			 //filhaal mene shaoe ko naya general banaya hai hence isko fix karna hoga later
 			if (Map[Grid(x, y)] == nullptr || Map[Grid(x, y)]->LOD !=TERR_LOD ) {
 			    Map[Grid(x, y)] = generateChunk(x, y,TERR_LOD,BUBBLES , SEED);  
 			}

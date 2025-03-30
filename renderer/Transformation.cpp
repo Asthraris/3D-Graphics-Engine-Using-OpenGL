@@ -1,18 +1,12 @@
 #include "Transformation.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-Transformation::Transformation()
-{
-	Model = glm::mat4(1.0f);
-	m_position = glm::vec3(0.0);
-}
 
-void Transformation::set_Model(const glm::mat4& temp)
-{
+
+Transformation::Transformation(const glm::mat4& temp){
 	Model = temp;
+	m_position = glm::vec3(Model[3]);
 }
-
-
 
 void Transformation::transform(glm::vec3 update){
 	m_position = update;
