@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 //for using memcpy for faster copying vertex data to shape
 #include <cstring>
-
+#include <iostream>
 #include "renderer/terrain/terrain_vertex.h"
 
 struct VERTEX {
@@ -13,6 +13,10 @@ struct VERTEX {
 	glm::vec3 COLOR = glm::vec3(0.1, 0.5, 0.1);
 	glm::vec3 NORMAL = glm::vec3(0.0);
 	glm::vec2 TEX_COORDS;
+	// Constructor for initializer list
+	VERTEX(glm::vec3 pos, glm::vec3 color, glm::vec3 normal, glm::vec2 tex)
+		: POS(pos), COLOR(color), NORMAL(normal), TEX_COORDS(tex) {
+	}
 };
 
 
@@ -21,13 +25,17 @@ private:
 	//filhaal me sab public kar raha hu baad me isko abstract karunga
 public:
 	std::vector<VERTEX> vertices;
-	std::vector<uint32_t> indices;
-	Shape() {};
-	Shape(const VERTEX* base,size_t num_verts,const uint32_t* base_inds, size_t num_inds) {
+	std::vector<unsigned short> indices;
+	Shape() {
+		std::cout << "Shape is Empty !\n";
+	}
+	Shape(const std::shared_ptr<Shape>& storedData) {
+		size_t num_verts = storedData->vertices.size();
+		size_t num_inds = storedData->indices.size();
 		vertices.resize(num_verts);
 		indices.resize(num_inds);
-		std::memcpy(vertices.data(), base, num_verts*sizeof(VERTEX));
-		std::memcpy(indices.data(), base_inds, num_inds*sizeof(uint32_t));
+		std::memcpy(vertices.data(), storedData->vertices.data(), num_verts * sizeof(VERTEX));
+		std::memcpy(indices.data(), storedData->indices.data(), num_inds * sizeof(unsigned short));
 	}
 };
 
