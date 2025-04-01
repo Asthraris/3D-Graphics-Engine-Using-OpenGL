@@ -19,13 +19,13 @@ private:
     EntitiesIDGenerator id_generator;
     ComponentManager Component_UNIT;
     scene_node* e_Root;
-    size_t NUM_STATIC_COMM;
-    size_t NUM_DYNAMIC_COMM;
-    size_t NUM_INSTANCE_COMM;
+  
 
-    unsigned int STATIC_VAO, STATIC_MDI_COMMAND, STATIC_MODEL_SSBO;
-    unsigned int DYNAMIC_VAO, DYNAMIC_MDI_COMMAND,DYNAMIC_MODEL_SSBO;
-    unsigned int INSTANCE_VAO, INSTANCE_MDI_COMMAND,INSTANCE_MODEL_SSBO;
+    size_t NUM_MERGED_COMM;
+    //needed while we render 
+    unsigned int MERGED_VAO, MERGED_MDI_COMMAND, MERGED_MODEL_SSSB;
+    //i have decided i m going to use PERCISTNAT map
+    
 
 
 
@@ -34,9 +34,8 @@ public:
         : id_generator(), Component_UNIT(), e_Root(nullptr) {
         //unlike glgenvertexarray it creates and binda automatically
         //for required now but using DSA method
-        glCreateVertexArrays(1, &STATIC_VAO);
-        glCreateVertexArrays(1, &DYNAMIC_VAO);
-        glCreateVertexArrays(1, &INSTANCE_VAO);
+        glCreateVertexArrays(1, &MERGED_VAO);
+        
 
     }
     ~SceneManager() {
@@ -71,11 +70,11 @@ public:
 
     }
     void Render_Scene() {
-        static size_t size_mdi_commands= sizeof(MDI_commands);
-        glBindVertexArray(STATIC_VAO);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER,STATIC_MDI_COMMAND);
+        static size_t sizeof_mdi_commands= sizeof(MDI_commands);
+        glBindVertexArray(MERGED_VAO);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
         glBindBufferBase(GL_SHADER_STORAGE_BLOCK,)
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_STATIC_COMM, size_mdi_commands);
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_STATIC_COMM, sizeof_mdi_commands);
     }
 
 
@@ -89,11 +88,11 @@ private:
         delete node;
     }
 
-    void UploadStaticData() {
+    void UploadData() {
         //baadme isse public private dekhna abhi public maanke chal
 
-        size_t TOTAL_VERTEX = Component_UNIT.next_static_cmd.base_vertex;
-        size_t TOTAL_INDEX = Component_UNIT.next_static_cmd.base_index;
+        size_t TOTAL_VERTEX = Component_UNIT.next_MERGED_MDI_CMD.base_vertex;
+        size_t TOTAL_INDEX = Component_UNIT.next_MERGED_MDI_CMD.base_index;
 
         std::vector<VERTEX> vertices(TOTAL_VERTEX);
         // Ensure the vector has enough space, if base_vertex is calculated incorrectly
@@ -112,7 +111,7 @@ private:
         size_t offset_inds = 0;
         size_t inds_size_bytes;
 
-        for (auto& shape_shr : Component_UNIT.static_entities_data.Shape_map) {
+        for (auto& shape_shr : Component_UNIT.STORAGE.Shape_map) {
 
             vert_size_bytes = shape_shr->vertices.size() * sizeof(VERTEX);
             inds_size_bytes = shape_shr->indices.size() * sizeof(unsigned short);

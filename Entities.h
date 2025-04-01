@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <deque>
-#include <unordered_map>
+#include <map>
 #include <string>
 
 #include "renderer/Transformation.h"
@@ -33,7 +33,7 @@ struct MDI_commands {
 struct MERGED_entity_renderer_data {
     std::vector< Transformation> transform_map;
     std::vector< std::shared_ptr<Shape>> Shape_map;
-    std::unordered_map<uint32_t, MDI_commands> indirect_commands_map;
+    std::map<uint32_t, MDI_commands> indirect_commands_map;
 };
 
 
@@ -46,96 +46,55 @@ private:
 public:
 
     //holds next base loaction to directly assign them with comm_map of 
-    MDI_commands next_static_cmd;
-    MDI_commands next_dynamic_cmd;
-    MDI_commands next_instance_cmd;
-
+    MDI_commands next_MERGED_MDI_CMD;
+    
     //REAL DATA STORAGE BLOCKS
     MERGED_entity_renderer_data STORAGE;
     //ye func jo enity factory se create hoga uske properties ko strore bas karega entity creation is hendeld by factory
 
-
     ComponentManager() {
-        next_static_cmd = {0,1,0,0,0};
-        next_dynamic_cmd = { 0,1,0,0,0 };
+        
         //instance me hume instance count sppecify karna hoga
-        next_instance_cmd = { 0,0,0,0,0 };
+        next_MERGED_MDI_CMD = { 0,0,0,0,0 };
 
         s_library = ShapeLibrary();
     }
 
 
-    void markEntry(ENTITY l_en ,std::string shapeName, size_t num_inst = 1,const glm::mat4& l_model = glm::mat4(1.0)) {
+    void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1, const glm::mat4& l_model = glm::mat4(1.0)) {
 
         auto Storedsh = s_library.getShapeData(shapeName);
         size_t num_inds = Storedsh->indices.size();
         size_t num_verts = Storedsh->vertices.size();
-        switch (l_en.type) {
 
-        case STATIC:
+        // Compute offsets BEFORE updating the map
+        MDI_commands currentCmd = {
+            num_inds, num_inst,
+            next_MERGED_MDI_CMD.base_index,    // Use existing offset
+            next_MERGED_MDI_CMD.base_vertex,
+            next_MERGED_MDI_CMD.base_instance
+        };
 
-            static_entities_data.Map_lookup[l_en.id] = {
-                static_entities_data.transform_map.size(),
-                static_entities_data.Shape_map.size(),
-                static_entities_data.indirect_commands.size()
-            };
 
-            static_entities_data.Shape_map.push_back(Storedsh);
-            static_entities_data.transform_map.emplace_back(Transformation(l_model));
+        STORAGE.indirect_commands_map[l_en.id] = currentCmd;
 
-            next_static_cmd = { num_inds, num_inst,
-                           next_static_cmd.base_index + num_inds,
-                           next_static_cmd.base_vertex + num_verts,
-                           next_static_cmd.base_instance + num_inst };
-            static_entities_data.indirect_commands.emplace_back(next_static_cmd);
-
-            break;
-        case DYNAMIC:
-
-            dynamic_entities_data.Map_lookup[l_en.id] = {
-            dynamic_entities_data.transform_map.size(),
-            dynamic_entities_data.Shape_map.size(),
-            dynamic_entities_data.indirect_commands.size()
-            };
-
-            dynamic_entities_data.Shape_map.push_back(Storedsh);
-            dynamic_entities_data.transform_map.emplace_back(Transformation(l_model));
-
-            next_dynamic_cmd = { num_inds, num_inst,
-                                next_dynamic_cmd.base_index + num_inds,
-                                next_dynamic_cmd.base_vertex + num_verts,
-                                next_dynamic_cmd.base_instance + num_inst };
-
-            dynamic_entities_data.indirect_commands.emplace_back(next_dynamic_cmd);
-            break;
-
-        case INSTANCED:
-            instanced_entities_data.Map_lookup[l_en.id] = {
-            instanced_entities_data.transform_map.size(),
-            instanced_entities_data.Shape_map.size(),
-            instanced_entities_data.indirect_commands.size()
-            };
-
-            instanced_entities_data.Shape_map.push_back(Storedsh);
-            instanced_entities_data.transform_map.emplace_back(Transformation(l_model));
-
-            next_instance_cmd = { num_inds, num_inst,
-                                 next_instance_cmd.base_index + num_inds,
-                                 next_instance_cmd.base_vertex + num_verts,
-                                 next_instance_cmd.base_instance + num_inst };
-
-            instanced_entities_data.indirect_commands.emplace_back(next_instance_cmd);
-            break;
-        default:
-            return;
+        STORAGE.Shape_map.push_back(Storedsh);
+        for (size_t i = 0; i < num_inst; i++)
+        {
+            STORAGE.transform_map.emplace_back(Transformation(l_model));
         }
-    }
 
+        // Update offsets for next entry
+        next_MERGED_MDI_CMD.base_index += num_inds;
+        next_MERGED_MDI_CMD.base_vertex += num_verts;
+        next_MERGED_MDI_CMD.base_instance += num_inst;
+
+    }
 };
 
+
+
 // ye enity create karega and their components ko bhi and strore karega in Comonents manger me 
-
-
 class EntitiesIDGenerator {
 private:
     uint32_t id_counter = 1;          // ID counter
