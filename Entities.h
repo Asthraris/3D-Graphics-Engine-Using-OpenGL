@@ -60,6 +60,9 @@ class ComponentManager {
 private:
     //HOLDS the every Shape recored
     ShapeLibrary s_library;
+
+public:
+
     //holds next base loaction to directly assign them with comm_map of 
     MDI_commands next_static_cmd;
     MDI_commands next_dynamic_cmd;
@@ -69,8 +72,9 @@ private:
     static_components static_entities_data;
     dynamic_components dynamic_entities_data;
     instance_components instanced_entities_data;
-public:
     //ye func jo enity factory se create hoga uske properties ko strore bas karega entity creation is hendeld by factory
+
+
     ComponentManager() {
         next_static_cmd = {0,1,0,0,0};
         next_dynamic_cmd = { 0,1,0,0,0 };
@@ -81,7 +85,7 @@ public:
     }
 
 
-    void markEntry(ENTITY l_en ,std::string shapeName,const glm::mat4& l_model = glm::mat4(1.0), size_t num_inst = 1) {
+    void markEntry(ENTITY l_en ,std::string shapeName, size_t num_inst = 1,const glm::mat4& l_model = glm::mat4(1.0)) {
 
         auto Storedsh = s_library.getShapeData(shapeName);
         size_t num_inds = Storedsh->indices.size();

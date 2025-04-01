@@ -19,21 +19,37 @@ private:
     EntitiesIDGenerator id_generator;
     ComponentManager Component_UNIT;
     scene_node* e_Root;
+    size_t NUM_STATIC_COMM;
+    size_t NUM_DYNAMIC_COMM;
+    size_t NUM_INSTANCE_COMM;
+
+    unsigned int Static_VAO, MDI_STATIC_COMMAND, STATIC_MODEL_SSBO;
+    unsigned int Dynamic_VAO, MDI_DYNAMIC_COMMAND,DYNAMIC_MODEL_SSBO;
+    unsigned int Instanced_VAO, MDI_INSTANCE_COMMAND,INSTANCE_MODEL_SSBO;
+
+
 
 public:
     SceneManager()
         : id_generator(), Component_UNIT(), e_Root(nullptr) {
+        //unlike glgenvertexarray it creates and binda automatically
+        //for required now but using DSA method
+        glCreateVertexArrays(1, &Static_VAO);
+        glCreateVertexArrays(1, &Dynamic_VAO);
+        glCreateVertexArrays(1, &Instanced_VAO);
+
     }
     ~SceneManager() {
         delete e_Root;  // Free the root
     }
     // Create entity with raw pointers for performance
-    void createEntity(entities_type l_type, scene_node* l_parent = nullptr) {
+    void createEntity(entities_type l_type, scene_node* l_parent = nullptr , size_t num_instnace =1) {
         // Allocate scene_node on the stack for better performance
-        ENTITY temp = ENTITY(id_generator.create_id(), l_type);
+        ENTITY temp = ENTITY(id_generator.create_id(),l_type );
+        if (l_parent->entity.type == DYNAMIC && num_instnace== 1)temp.type = DYNAMIC;
 
         // Mark entry with temp entity
-        Component_UNIT.markEntry(temp,"CUBE");
+        Component_UNIT.markEntry(temp,"CUBE",num_instnace);
 
         scene_node* new_node = new scene_node(temp);
 
@@ -50,6 +66,19 @@ public:
         deleteScene(e_Root);
     }
 
+    //Later JOB
+    void Update_Scene() {
+
+    }
+    void Render_Scene() {
+        static size_t size_mdi_commands= sizeof(MDI_commands);
+        glBindVertexArray(Static_VAO);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER,MDI_STATIC_COMMAND);
+        glBindBufferBase(GL_SHADER_STORAGE_BLOCK,)
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_STATIC_COMM, size_mdi_commands);
+    }
+
+
 private:
     // Recursive function to free all nodes
     void deleteScene(scene_node* node) {
@@ -58,5 +87,90 @@ private:
             deleteScene(child);
         }
         delete node;
+    }
+
+    void UploadStaticData() {
+        //baadme isse public private dekhna abhi public maanke chal
+
+        size_t TOTAL_VERTEX = Component_UNIT.next_static_cmd.base_vertex;
+        size_t TOTAL_INDEX = Component_UNIT.next_static_cmd.base_index;
+
+        std::vector<VERTEX> vertices(TOTAL_VERTEX);
+        // Ensure the vector has enough space, if base_vertex is calculated incorrectly
+        if (vertices.size() < TOTAL_VERTEX) {
+            vertices.resize(TOTAL_VERTEX);
+        }
+
+        std::vector<unsigned short>indices(TOTAL_INDEX);
+        if (indices.size() < TOTAL_INDEX) {
+            indices.resize(TOTAL_INDEX);
+        }
+
+        size_t offset_verts = 0;
+        size_t vert_size_bytes;
+
+        size_t offset_inds = 0;
+        size_t inds_size_bytes;
+
+        for (auto& shape_shr : Component_UNIT.static_entities_data.Shape_map) {
+
+            vert_size_bytes = shape_shr->vertices.size() * sizeof(VERTEX);
+            inds_size_bytes = shape_shr->indices.size() * sizeof(unsigned short);
+            //if memeory error use std::copy
+            memcpy(reinterpret_cast<char*>(vertices.data()) + offset_verts,
+                shape_shr->vertices.data(), vert_size_bytes);
+            memcpy(reinterpret_cast<char*>(indices.data()) + offset_inds,
+                shape_shr->indices.data(), inds_size_bytes);
+
+            offset_verts += vert_size_bytes;
+            offset_inds += inds_size_bytes;
+
+        }
+
+        //for vertex buffer
+        unsigned int VBO;
+
+        //for index buffer
+        unsigned int IBO;
+
+
+        //binding the vAO before creation so i dont need to bind buffer again
+        glBindVertexArray(Static_VAO);
+        glCreateBuffers(1, &VBO);
+        glNamedBufferData(VBO,TOTAL_VERTEX *sizeof(VERTEX), vertices.data(), GL_STATIC_DRAW); // OpenGL 4.5
+        //linking not sure where this should be
+
+        //ek baar hi set karnega as bining index 0 par ab kaam hoga with stride as vertexsize
+        glVertexArrayVertexBuffer(Static_VAO, 0, VBO, 0, sizeof(VERTEX)); // OpenGL 4.5
+
+        
+        glEnableVertexArrayAttrib(Static_VAO, 0);
+        glVertexArrayAttribFormat(Static_VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, POS));
+        glVertexArrayAttribBinding(Static_VAO, 0, 0);
+
+        glEnableVertexArrayAttrib(Static_VAO, 1);
+        glVertexArrayAttribFormat(Static_VAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, COLOR));
+        glVertexArrayAttribBinding(Static_VAO, 1, 0);
+
+        glEnableVertexArrayAttrib(Static_VAO, 2);
+        glVertexArrayAttribFormat(Static_VAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, NORMAL));
+        glVertexArrayAttribBinding(Static_VAO, 2, 0);
+
+        glEnableVertexArrayAttrib(Static_VAO, 3);
+        glVertexArrayAttribFormat(Static_VAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(VERTEX, TEX_COORDS));
+        glVertexArrayAttribBinding(Static_VAO, 3, 0);
+
+        //link Index buffer to VAO
+        glCreateBuffers(1, &IBO);
+        glNamedBufferData(IBO, TOTAL_INDEX * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
+        glVertexArrayElementBuffer(Static_VAO, IBO);
+
+        //link Commandbuffer to VAO
+
+        NUM_STATIC_COMM = Component_UNIT.static_entities_data.indirect_commands.size();
+        glCreateBuffers(1, &MDI_STATIC_COMMAND);
+        glNamedBufferData(MDI_STATIC_COMMAND, sizeof(MDI_commands) * NUM_STATIC_COMM,
+            Component_UNIT.static_entities_data.indirect_commands.data(), GL_STATIC_DRAW);
+        
     }
 };
