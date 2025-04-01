@@ -13,7 +13,7 @@ enum entities_type{
 	INSTANCED,
 	LIGHT,
 	PARTICLES
-};
+};//type wala system ko mene drop kardiya balki ab me persistant map use karunga for instnace sso no need to make dynamic buffer,aur vese bhu vertex and index data kaha update hota hai {baad me usse bhi dynamic kar dunga for addition of entity on runtime}
 
 struct ENTITY {
     uint32_t id;
@@ -30,31 +30,13 @@ struct MDI_commands {
 	size_t base_instance;
 };
 
-struct comp_layout_renderer {
-    size_t Trans_index;
-    size_t shape_index;
-    size_t commd_index;
-
-};
-struct entity_renderer_data {
+struct MERGED_entity_renderer_data {
     std::vector< Transformation> transform_map;
     std::vector< std::shared_ptr<Shape>> Shape_map;
-    std::vector< MDI_commands> indirect_commands;
-    std::unordered_map<uint32_t, comp_layout_renderer> Map_lookup;
+    std::unordered_map<uint32_t, MDI_commands> indirect_commands_map;
 };
 
-//mai teeno components ka alag struct bana raha hu instead of having pure ECS
-struct static_components: public entity_renderer_data {
-	
-};
 
-struct dynamic_components:public entity_renderer_data {
-
-};
-// Special struct for instance entity transforms
-struct instance_components: public entity_renderer_data {
-                  
-};
 
 class ComponentManager {
 private:
@@ -69,9 +51,7 @@ public:
     MDI_commands next_instance_cmd;
 
     //REAL DATA STORAGE BLOCKS
-    static_components static_entities_data;
-    dynamic_components dynamic_entities_data;
-    instance_components instanced_entities_data;
+    MERGED_entity_renderer_data STORAGE;
     //ye func jo enity factory se create hoga uske properties ko strore bas karega entity creation is hendeld by factory
 
 

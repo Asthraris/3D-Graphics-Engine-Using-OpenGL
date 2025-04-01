@@ -23,9 +23,9 @@ private:
     size_t NUM_DYNAMIC_COMM;
     size_t NUM_INSTANCE_COMM;
 
-    unsigned int Static_VAO, MDI_STATIC_COMMAND, STATIC_MODEL_SSBO;
-    unsigned int Dynamic_VAO, MDI_DYNAMIC_COMMAND,DYNAMIC_MODEL_SSBO;
-    unsigned int Instanced_VAO, MDI_INSTANCE_COMMAND,INSTANCE_MODEL_SSBO;
+    unsigned int STATIC_VAO, STATIC_MDI_COMMAND, STATIC_MODEL_SSBO;
+    unsigned int DYNAMIC_VAO, DYNAMIC_MDI_COMMAND,DYNAMIC_MODEL_SSBO;
+    unsigned int INSTANCE_VAO, INSTANCE_MDI_COMMAND,INSTANCE_MODEL_SSBO;
 
 
 
@@ -34,9 +34,9 @@ public:
         : id_generator(), Component_UNIT(), e_Root(nullptr) {
         //unlike glgenvertexarray it creates and binda automatically
         //for required now but using DSA method
-        glCreateVertexArrays(1, &Static_VAO);
-        glCreateVertexArrays(1, &Dynamic_VAO);
-        glCreateVertexArrays(1, &Instanced_VAO);
+        glCreateVertexArrays(1, &STATIC_VAO);
+        glCreateVertexArrays(1, &DYNAMIC_VAO);
+        glCreateVertexArrays(1, &INSTANCE_VAO);
 
     }
     ~SceneManager() {
@@ -72,8 +72,8 @@ public:
     }
     void Render_Scene() {
         static size_t size_mdi_commands= sizeof(MDI_commands);
-        glBindVertexArray(Static_VAO);
-        glBindBuffer(GL_DRAW_INDIRECT_BUFFER,MDI_STATIC_COMMAND);
+        glBindVertexArray(STATIC_VAO);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER,STATIC_MDI_COMMAND);
         glBindBufferBase(GL_SHADER_STORAGE_BLOCK,)
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_STATIC_COMM, size_mdi_commands);
     }
@@ -135,41 +135,41 @@ private:
 
 
         //binding the vAO before creation so i dont need to bind buffer again
-        glBindVertexArray(Static_VAO);
+        glBindVertexArray(STATIC_VAO);
         glCreateBuffers(1, &VBO);
         glNamedBufferData(VBO,TOTAL_VERTEX *sizeof(VERTEX), vertices.data(), GL_STATIC_DRAW); // OpenGL 4.5
         //linking not sure where this should be
 
         //ek baar hi set karnega as bining index 0 par ab kaam hoga with stride as vertexsize
-        glVertexArrayVertexBuffer(Static_VAO, 0, VBO, 0, sizeof(VERTEX)); // OpenGL 4.5
+        glVertexArrayVertexBuffer(STATIC_VAO, 0, VBO, 0, sizeof(VERTEX)); // OpenGL 4.5
 
         
-        glEnableVertexArrayAttrib(Static_VAO, 0);
-        glVertexArrayAttribFormat(Static_VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, POS));
-        glVertexArrayAttribBinding(Static_VAO, 0, 0);
+        glEnableVertexArrayAttrib(STATIC_VAO, 0);
+        glVertexArrayAttribFormat(STATIC_VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, POS));
+        glVertexArrayAttribBinding(STATIC_VAO, 0, 0);
 
-        glEnableVertexArrayAttrib(Static_VAO, 1);
-        glVertexArrayAttribFormat(Static_VAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, COLOR));
-        glVertexArrayAttribBinding(Static_VAO, 1, 0);
+        glEnableVertexArrayAttrib(STATIC_VAO, 1);
+        glVertexArrayAttribFormat(STATIC_VAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, COLOR));
+        glVertexArrayAttribBinding(STATIC_VAO, 1, 0);
 
-        glEnableVertexArrayAttrib(Static_VAO, 2);
-        glVertexArrayAttribFormat(Static_VAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, NORMAL));
-        glVertexArrayAttribBinding(Static_VAO, 2, 0);
+        glEnableVertexArrayAttrib(STATIC_VAO, 2);
+        glVertexArrayAttribFormat(STATIC_VAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, NORMAL));
+        glVertexArrayAttribBinding(STATIC_VAO, 2, 0);
 
-        glEnableVertexArrayAttrib(Static_VAO, 3);
-        glVertexArrayAttribFormat(Static_VAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(VERTEX, TEX_COORDS));
-        glVertexArrayAttribBinding(Static_VAO, 3, 0);
+        glEnableVertexArrayAttrib(STATIC_VAO, 3);
+        glVertexArrayAttribFormat(STATIC_VAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(VERTEX, TEX_COORDS));
+        glVertexArrayAttribBinding(STATIC_VAO, 3, 0);
 
         //link Index buffer to VAO
         glCreateBuffers(1, &IBO);
         glNamedBufferData(IBO, TOTAL_INDEX * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
-        glVertexArrayElementBuffer(Static_VAO, IBO);
+        glVertexArrayElementBuffer(STATIC_VAO, IBO);
 
         //link Commandbuffer to VAO
 
         NUM_STATIC_COMM = Component_UNIT.static_entities_data.indirect_commands.size();
-        glCreateBuffers(1, &MDI_STATIC_COMMAND);
-        glNamedBufferData(MDI_STATIC_COMMAND, sizeof(MDI_commands) * NUM_STATIC_COMM,
+        glCreateBuffers(1, &STATIC_MDI_COMMAND);
+        glNamedBufferData(STATIC_MDI_COMMAND, sizeof(MDI_commands) * NUM_STATIC_COMM,
             Component_UNIT.static_entities_data.indirect_commands.data(), GL_STATIC_DRAW);
         
     }
