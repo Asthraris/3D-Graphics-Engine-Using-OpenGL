@@ -17,11 +17,10 @@ public:
 	ShapeLibrary() {
 		//add default shapes
         createCube();
-        createCylinder();
         createPlane();
         createPyramid();
         createSphere();
-        
+        createCylinder();
 	}
 	void addShapeData(const std::string& name, std::shared_ptr<Shape> shape) {
 		StoredShapes[name] = shape;
@@ -83,44 +82,7 @@ public:
         addShapeData("PLANE", plane);
 
     }
-    void createSphere(float radius = 1.0f, int sectors = 24, int stacks = 16) {
-        std::shared_ptr<Shape> sphere = std::make_shared<Shape>();
-
-
-        for (int i = 0; i <= stacks; ++i) {
-            float lat = PI * (-0.5f + (float)i / stacks);
-            float y = radius * sin(lat);
-            float r = radius * cos(lat);
-
-            for (int j = 0; j <= sectors; ++j) {
-                float lon = 2 * PI * (float)j / sectors;
-                float x = r * cos(lon);
-                float z = r * sin(lon);
-
-                sphere->vertices.push_back({
-                    {x, y, z},
-                    {x / radius, y / radius, z / radius},
-                    {x, y, z},
-                    {static_cast<float>(j) / sectors, static_cast<float>(i) / stacks}
-                    });
-
-                if (i < stacks && j < sectors) {
-                    int nextRow = i + 1;
-                    int nextCol = j + 1;
-
-                    sphere->indices.push_back(i * (sectors + 1) + j);
-                    sphere->indices.push_back(nextRow * (sectors + 1) + j);
-                    sphere->indices.push_back(i * (sectors + 1) + nextCol);
-                          
-                    sphere->indices.push_back(i * (sectors + 1) + nextCol);
-                    sphere->indices.push_back(nextRow * (sectors + 1) + j);
-                    sphere->indices.push_back(nextRow * (sectors + 1) + nextCol);
-                }
-            }
-        }
-
-        addShapeData("SPHERE", sphere);
-    }
+   
     void createPyramid(float size = 1.0f) {
         std::shared_ptr<Shape> pyramid = std::make_shared<Shape>();
 
@@ -145,21 +107,94 @@ public:
 
         addShapeData("PYRAMID", pyramid);
     }
+    void createSphere(float radius = 1.0f, int sectors = 24, int stacks = 16) {
+        std::shared_ptr<Shape> sphere = std::make_shared<Shape>();
+
+        float pi = 3.14159265359f;
+        for (int i = 0; i <= stacks; ++i) {
+            float lat = pi * (-0.5f + (float)i / stacks);
+            float y = radius * sin(lat);
+            float r = radius * cos(lat);
+
+            for (int j = 0; j <= sectors; ++j) {
+                float lon = 2.0f * pi * (float)j / sectors;
+                float x = r * cos(lon);
+                float z = r * sin(lon);
+
+                glm::vec3 normal = glm::normalize(glm::vec3(x, y, z));
+                sphere->vertices.emplace_back(glm::vec3(x, y, z), normal, normal, glm::vec2((float)j / sectors, (float)i / stacks));
+
+                if (i < stacks && j < sectors) {
+                    int nextRow = (i + 1) * (sectors + 1);
+                    int nextCol = j + 1;
+
+                    sphere->indices.push_back(i * (sectors + 1) + j);
+                    sphere->indices.push_back(nextRow + j);
+                    sphere->indices.push_back(i * (sectors + 1) + nextCol);
+
+                    sphere->indices.push_back(i * (sectors + 1) + nextCol);
+                    sphere->indices.push_back(nextRow + j);
+                    sphere->indices.push_back(nextRow + nextCol);
+                }
+            }
+        }
+
+        addShapeData("SPHERE", sphere);
+    }
     void createCylinder(float radius = 1.0f, float height = 2.0f, int segments = 36) {
         std::shared_ptr<Shape> cylinder = std::make_shared<Shape>();
 
+        float angleStep = 2.0f * 3.14159265359f / segments;
+        float halfHeight = height / 2.0f;
 
-        float angleStep = 2 * PI / segments;
-
+        // Generate vertices for the side of the cylinder
         for (int i = 0; i <= segments; ++i) {
             float angle = i * angleStep;
             float x = radius * cos(angle);
             float z = radius * sin(angle);
 
-            cylinder->vertices.push_back({ {x, height / 2, z}, {1, 0, 0}, {x, 0, z}, {0, 0} });
-            cylinder->vertices.push_back({ {x, -height / 2, z}, {0, 0, 1}, {x, 0, z}, {1, 0} });
+            // Top and bottom circle vertices
+            cylinder->vertices.emplace_back(glm::vec3(x, halfHeight, z), glm::vec3(1, 0, 0), glm::vec3(x, 0, z), glm::vec2(i / (float)segments, 1.0f));
+            cylinder->vertices.emplace_back(glm::vec3(x, -halfHeight, z), glm::vec3(0, 0, 1), glm::vec3(x, 0, z), glm::vec2(i / (float)segments, 0.0f));
+        }
+
+        // Generate indices for sides
+        for (int i = 0; i < segments; ++i) {
+            int top1 = 2 * i;
+            int bottom1 = top1 + 1;
+            int top2 = 2 * ((i + 1) % segments);
+            int bottom2 = top2 + 1;
+
+            cylinder->indices.push_back(top1);
+            cylinder->indices.push_back(bottom1);
+            cylinder->indices.push_back(top2);
+
+            cylinder->indices.push_back(top2);
+            cylinder->indices.push_back(bottom1);
+            cylinder->indices.push_back(bottom2);
+        }
+
+        // Generate center points for caps
+        size_t topCenter = cylinder->vertices.size();
+        cylinder->vertices.emplace_back(glm::vec3(0, halfHeight, 0), glm::vec3(1, 1, 1), glm::vec3(0, 1, 0), glm::vec2(0.5f, 0.5f));
+        size_t bottomCenter = cylinder->vertices.size();
+        cylinder->vertices.emplace_back(glm::vec3(0, -halfHeight, 0), glm::vec3(1, 1, 1), glm::vec3(0, -1, 0), glm::vec2(0.5f, 0.5f));
+
+        // Generate indices for caps
+        for (int i = 0; i < segments; ++i) {
+            int next = (i + 1) % segments;
+            cylinder->indices.push_back(topCenter);
+            cylinder->indices.push_back(2 * next);
+            cylinder->indices.push_back(2 * i);
+
+            cylinder->indices.push_back(bottomCenter);
+            cylinder->indices.push_back(2 * i + 1);
+            cylinder->indices.push_back(2 * next + 1);
         }
 
         addShapeData("CYLINDER", cylinder);
     }
+
+
+
 };

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include "Entities.h"
+#include "renderer/src/Shader.h"
 
 struct scene_node {
     ENTITY entity;
@@ -19,15 +20,21 @@ private:
     EntitiesIDGenerator id_generator;
     ComponentManager Component_UNIT;
     scene_node* e_Root;
-  
+    Shader* SHADER;
 
-    size_t NUM_MERGED_COMM;
+    size_t NUM_MERGED_CMD;
     //needed while we render 
-    unsigned int MERGED_VAO, MERGED_MDI_COMMAND, MERGED_MODEL_SSSB;
+    unsigned int MERGED_VAO, MERGED_MDI_COMMAND, MERGED_MODEL_SSBO;
+
+    //for vertex buffer
+    unsigned int VBO;
+
+    //for index buffer
+    unsigned int IBO;
     //i have decided i m going to use PERCISTNAT map
-    
+    int BINDIND_INDX_INST = 0;
 
-
+    GLsizei sizeof_mdi_commands = sizeof(MDI_commands);
 
 public:
     SceneManager()
@@ -35,11 +42,12 @@ public:
         //unlike glgenvertexarray it creates and binda automatically
         //for required now but using DSA method
         glCreateVertexArrays(1, &MERGED_VAO);
-        
+        glBindBufferBase(GL_SHADER_STORAGE_BLOCK, BINDIND_INDX_INST, MERGED_MODEL_SSBO);
 
     }
     ~SceneManager() {
-        delete e_Root;  // Free the root
+        deleteScene(e_Root);
+        glDeleteVertexArrays(1, &MERGED_VAO);  // Free the root
     }
     // Create entity with raw pointers for performance
     void createEntity(entities_type l_type, scene_node* l_parent = nullptr , size_t num_instnace =1) {
@@ -60,35 +68,24 @@ public:
         }
     }
 
-    // Destructor to prevent memory leaks
-    ~SceneManager() {
-        deleteScene(e_Root);
-    }
-
     //Later JOB
-    void Update_Scene() {
+    void Update_Scene(float deltaTime) {
 
     }
     void Render_Scene() {
-        static size_t sizeof_mdi_commands= sizeof(MDI_commands);
+
+
+        //mere hussab se Ek hi pura shader switch insme hi rakhta hu or renderer mai ke unnessesary swich na ho
+        
+        
         glBindVertexArray(MERGED_VAO);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
-        glBindBufferBase(GL_SHADER_STORAGE_BLOCK,)
-        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_STATIC_COMM, sizeof_mdi_commands);
+        
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_MERGED_CMD, sizeof_mdi_commands);
     }
 
 
-private:
-    // Recursive function to free all nodes
-    void deleteScene(scene_node* node) {
-        if (!node) return;
-        for (auto* child : node->Childrens) {
-            deleteScene(child);
-        }
-        delete node;
-    }
-
-    void UploadData() {
+    void InitializeData() {
         //baadme isse public private dekhna abhi public maanke chal
 
         size_t TOTAL_VERTEX = Component_UNIT.next_MERGED_MDI_CMD.base_vertex;
@@ -111,7 +108,7 @@ private:
         size_t offset_inds = 0;
         size_t inds_size_bytes;
 
-        for (auto& shape_shr : Component_UNIT.STORAGE.Shape_map) {
+        for (auto& shape_shr : Component_UNIT.STORAGE.Shape_data) {
 
             vert_size_bytes = shape_shr->vertices.size() * sizeof(VERTEX);
             inds_size_bytes = shape_shr->indices.size() * sizeof(unsigned short);
@@ -126,50 +123,66 @@ private:
 
         }
 
-        //for vertex buffer
-        unsigned int VBO;
-
-        //for index buffer
-        unsigned int IBO;
+        
 
 
         //binding the vAO before creation so i dont need to bind buffer again
-        glBindVertexArray(STATIC_VAO);
+        glBindVertexArray(MERGED_VAO);
         glCreateBuffers(1, &VBO);
         glNamedBufferData(VBO,TOTAL_VERTEX *sizeof(VERTEX), vertices.data(), GL_STATIC_DRAW); // OpenGL 4.5
         //linking not sure where this should be
 
         //ek baar hi set karnega as bining index 0 par ab kaam hoga with stride as vertexsize
-        glVertexArrayVertexBuffer(STATIC_VAO, 0, VBO, 0, sizeof(VERTEX)); // OpenGL 4.5
+        glVertexArrayVertexBuffer(MERGED_VAO, 0, VBO, 0, sizeof(VERTEX)); // OpenGL 4.5
 
         
-        glEnableVertexArrayAttrib(STATIC_VAO, 0);
-        glVertexArrayAttribFormat(STATIC_VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, POS));
-        glVertexArrayAttribBinding(STATIC_VAO, 0, 0);
+        glEnableVertexArrayAttrib(MERGED_VAO, 0);
+        glVertexArrayAttribFormat(MERGED_VAO, 0, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, POS));
+        glVertexArrayAttribBinding(MERGED_VAO, 0, 0);
 
-        glEnableVertexArrayAttrib(STATIC_VAO, 1);
-        glVertexArrayAttribFormat(STATIC_VAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, COLOR));
-        glVertexArrayAttribBinding(STATIC_VAO, 1, 0);
+        glEnableVertexArrayAttrib(MERGED_VAO, 1);
+        glVertexArrayAttribFormat(MERGED_VAO, 1, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, COLOR));
+        glVertexArrayAttribBinding(MERGED_VAO, 1, 0);
 
-        glEnableVertexArrayAttrib(STATIC_VAO, 2);
-        glVertexArrayAttribFormat(STATIC_VAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, NORMAL));
-        glVertexArrayAttribBinding(STATIC_VAO, 2, 0);
+        glEnableVertexArrayAttrib(MERGED_VAO, 2);
+        glVertexArrayAttribFormat(MERGED_VAO, 2, 3, GL_FLOAT, GL_FALSE, offsetof(VERTEX, NORMAL));
+        glVertexArrayAttribBinding(MERGED_VAO, 2, 0);
 
-        glEnableVertexArrayAttrib(STATIC_VAO, 3);
-        glVertexArrayAttribFormat(STATIC_VAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(VERTEX, TEX_COORDS));
-        glVertexArrayAttribBinding(STATIC_VAO, 3, 0);
+        glEnableVertexArrayAttrib(MERGED_VAO, 3);
+        glVertexArrayAttribFormat(MERGED_VAO, 3, 2, GL_FLOAT, GL_FALSE, offsetof(VERTEX, TEX_COORDS));
+        glVertexArrayAttribBinding(MERGED_VAO, 3, 0);
 
         //link Index buffer to VAO
         glCreateBuffers(1, &IBO);
         glNamedBufferData(IBO, TOTAL_INDEX * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
-        glVertexArrayElementBuffer(STATIC_VAO, IBO);
+        glVertexArrayElementBuffer(MERGED_VAO, IBO);
+
+        /*
+        
+        FOR NOW I HAVE MAKE IT FIXED SIZE BEFORE COMPIALATION SIZE 
+        IF THIS WROK MAKE IT RUNTIME SO TAKE BIGGGER SSBO SIZE 
+        
+        */
+        glCreateBuffers(1, &MERGED_MODEL_SSBO);
+        glNamedBufferStorage(MERGED_MODEL_SSBO, Component_UNIT.STORAGE.transform_data.size(), Component_UNIT.STORAGE.transform_data.data(),GL_DYNAMIC_STORAGE_BIT);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, BINDIND_INDX_INST, MERGED_MODEL_SSBO);
 
         //link Commandbuffer to VAO
 
-        NUM_STATIC_COMM = Component_UNIT.static_entities_data.indirect_commands.size();
-        glCreateBuffers(1, &STATIC_MDI_COMMAND);
-        glNamedBufferData(STATIC_MDI_COMMAND, sizeof(MDI_commands) * NUM_STATIC_COMM,
-            Component_UNIT.static_entities_data.indirect_commands.data(), GL_STATIC_DRAW);
+        NUM_MERGED_CMD = Component_UNIT.STORAGE.indirect_commands_data.size();
+        glCreateBuffers(1, &MERGED_MDI_COMMAND);
+        glNamedBufferData(MERGED_MDI_COMMAND, sizeof(MDI_commands) * NUM_MERGED_CMD ,
+            Component_UNIT.STORAGE.indirect_commands_data.data(), GL_DYNAMIC_STORAGE_BIT);
         
     }
+private:
+    // Recursive function to free all nodes
+    void deleteScene(scene_node* node) {
+        if (!node) return;
+        for (auto* child : node->Childrens) {
+            deleteScene(child);
+        }
+        delete node;
+    }
+
 };

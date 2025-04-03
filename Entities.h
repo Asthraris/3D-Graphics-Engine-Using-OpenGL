@@ -4,7 +4,6 @@
 #include <map>
 #include <string>
 
-#include "renderer/Transformation.h"
 #include "Shape.h"
 #include "Shape_Library.h"
 enum entities_type{
@@ -31,9 +30,9 @@ struct MDI_commands {
 };
 
 struct MERGED_entity_renderer_data {
-    std::vector< Transformation> transform_map;
-    std::vector< std::shared_ptr<Shape>> Shape_map;
-    std::map<uint32_t, MDI_commands> indirect_commands_map;
+    std::vector<glm::mat4> transform_data;
+    std::vector< std::shared_ptr<Shape>> Shape_data;
+    std::vector< MDI_commands> indirect_commands_data;
 };
 
 
@@ -76,12 +75,12 @@ public:
         };
 
 
-        STORAGE.indirect_commands_map[l_en.id] = currentCmd;
+        STORAGE.indirect_commands_data[l_en.id] = currentCmd;
 
-        STORAGE.Shape_map.push_back(Storedsh);
+        STORAGE.Shape_data.push_back(Storedsh);
         for (size_t i = 0; i < num_inst; i++)
         {
-            STORAGE.transform_map.emplace_back(Transformation(l_model));
+            STORAGE.transform_data.emplace_back(l_model);
         }
 
         // Update offsets for next entry
@@ -98,24 +97,17 @@ public:
 class EntitiesIDGenerator {
 private:
     uint32_t id_counter = 1;          // ID counter
-    std::vector<uint32_t> free_ids;   //  Freed IDs for reuse
-
+    
 public:
     uint32_t create_id() {
-        if (!free_ids.empty()) {
-            uint32_t id = free_ids.back();    //  Reuse freed ID
-            free_ids.pop_back();
-            return id;
-        }
         return id_counter++;
     }
 
     void destroy_id(uint32_t id) {
-        free_ids.push_back(id);              //  Recycle ID
+                      //  Recycle ID
     }
 
     void reset() {
-        free_ids.clear();
         id_counter = 1;
     }
 };

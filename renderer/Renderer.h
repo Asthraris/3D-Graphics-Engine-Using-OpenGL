@@ -8,8 +8,10 @@
 #include <../imgui/imgui_impl_glfw.h>
 #include <../imgui/imgui_impl_opengl3.h>
 //utils
+#include "src/Shader.h"
 #include "LightManager.h"
 #include "Config.h"
+#include "../SceneManager.h"
 
 //for enhance
 #include <memory>
@@ -24,6 +26,9 @@ private:
 	std::unique_ptr<WINDOW> win;
 	CONFIG settings;
 	LightManager Aura;
+
+	Shader* SHADER;
+	SceneManager* SCENE;
 	void IMGUI_INIT(GLFWwindow*);
 	void IMGUI_RENDER(int);
 	void IMGUI_DESTROY();

@@ -131,6 +131,9 @@ Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 
 	settings = CONFIG(lvl);
 	Aura = LightManager(3);
+
+	SHADER = new Shader("renderer/src/shaders/basic.vert", "renderer/src/shaders/basic.frag");
+	SCENE = new SceneManager();
 }
 
 Renderer::~Renderer()
@@ -148,12 +151,15 @@ void Renderer::Run()
 	Camera cam(60.0f, 0.1f, 100.0f, float(win->width) / (float)win->height );
 
 	//Terrain riverland;
+	// 
 	//keyboard event listener 
 	glfwSetKeyCallback(win->ptr, keyCallback);
 
+	SCENE->createEntity(STATIC, nullptr, 1);
 	
 	
-	
+
+	SCENE->InitializeData();
 	while (!glfwWindowShouldClose(win->ptr)) {
 		deltaTime = Timer();
 		//std::cout << 1.0/deltaTime << "\n";
@@ -164,8 +170,15 @@ void Renderer::Run()
 		cam.Move(deltaTime, win->ptr);
 		cam.Look(deltaTime, win->ptr);
 
-			
-		
+		SHADER->Activate();
+		SHADER->viewMatrix(cam.renderView());
+		SHADER->projMatrix(cam.getProjMatrix());
+		SHADER->UpdateNUM_LIGHTS(Aura.NUM_LIGHTS);
+
+
+		SCENE->Update_Scene(deltaTime);
+		SCENE->Render_Scene();
+
 		
 		//riverland.dynamicLoad(cam, Aura.NUM_LIGHTS, settings.render_distance, settings.level_of_detail);
 

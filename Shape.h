@@ -12,11 +12,12 @@ struct VERTEX {
 	glm::vec3 POS;
 	glm::vec3 COLOR = glm::vec3(0.1, 0.5, 0.1);
 	glm::vec3 NORMAL = glm::vec3(0.0);
-	glm::vec2 TEX_COORDS;
-	// Constructor for initializer list
+	glm::vec2 TEX_COORDS = glm::vec2(0.0);  // Ensuring proper initialization
+
+	// Default constructor
+	VERTEX() = default;
 	VERTEX(glm::vec3 pos, glm::vec3 color, glm::vec3 normal, glm::vec2 tex)
-		: POS(pos), COLOR(color), NORMAL(normal), TEX_COORDS(tex) {
-	}
+		: POS(pos), COLOR(color), NORMAL(normal), TEX_COORDS(tex) {}
 };
 
 
@@ -27,15 +28,13 @@ public:
 	std::vector<VERTEX> vertices;
 	std::vector<unsigned short> indices;
 	Shape() {
-		std::cout << "Shape is Empty !\n";
+		std::cout << "Shape is Empty!\n";
 	}
-	Shape(const std::shared_ptr<Shape>& storedData) {
-		size_t num_verts = storedData->vertices.size();
-		size_t num_inds = storedData->indices.size();
-		vertices.resize(num_verts);
-		indices.resize(num_inds);
-		std::memcpy(vertices.data(), storedData->vertices.data(), num_verts * sizeof(VERTEX));
-		std::memcpy(indices.data(), storedData->indices.data(), num_inds * sizeof(unsigned short));
+
+	// Copy constructor (fixed, no unsafe memcpy)
+	Shape(const Shape& storedData) {
+		vertices = storedData.vertices; // Direct copy
+		indices = storedData.indices;   // Direct copy
 	}
 };
 
