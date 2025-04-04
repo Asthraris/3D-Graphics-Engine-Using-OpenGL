@@ -1,6 +1,5 @@
 #include "Renderer.h"
 
-#include "terrain/Terrain.h"
 #include "../Camera.h"
 
 
@@ -57,7 +56,7 @@ void Renderer::IMGUI_INIT(GLFWwindow* window_ptr)
 	(void)io;
 
 	ImGui_ImplGlfw_InitForOpenGL(window_ptr, true);
-	ImGui_ImplOpenGL3_Init("#version 450");
+	ImGui_ImplOpenGL3_Init("#version 460");
 }
 
 void Renderer::IMGUI_RENDER(int fps)
@@ -110,13 +109,15 @@ Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 
 	
 	win->construct();
 	
 	
+
 	glfwMakeContextCurrent(win->ptr);
 	//glfw se humne glad procedure address liya fir typecast kiya to glad provided script then load kiya into glad
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
@@ -124,6 +125,8 @@ Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 	glViewport(0, 0, win->width, win->height);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
+	glEnable(GL_ARB_draw_indirect);
+
 	glCullFace(GL_BACK);
 
 	IMGUI_INIT(win->ptr);
@@ -134,6 +137,9 @@ Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 
 	SHADER = new Shader("renderer/src/shaders/basic.vert", "renderer/src/shaders/basic.frag");
 	SCENE = new SceneManager();
+
+	std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+
 }
 
 Renderer::~Renderer()
@@ -155,9 +161,14 @@ void Renderer::Run()
 	//keyboard event listener 
 	glfwSetKeyCallback(win->ptr, keyCallback);
 
-	SCENE->createEntity(STATIC, nullptr, 1);
+		//SLIDER DEBUG METER
+		if (DEBUGfirstrun)checkError();
+		DEBUGfirstrun = false;
+		//SLIDER DEBUG METER
+	SCENE->createEntity(STATIC,"CUBE");
 	
 	
+
 
 	SCENE->InitializeData();
 	while (!glfwWindowShouldClose(win->ptr)) {
@@ -187,10 +198,6 @@ void Renderer::Run()
 
 		glfwPollEvents();
 
-		//SLIDER DEBUG METER
-		if (DEBUGfirstrun)checkError();
-		DEBUGfirstrun = false;
-		//SLIDER DEBUG METER
 
 	}
 }

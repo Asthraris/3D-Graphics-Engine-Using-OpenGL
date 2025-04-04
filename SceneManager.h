@@ -34,7 +34,7 @@ private:
     //i have decided i m going to use PERCISTNAT map
     int BINDIND_INDX_INST = 0;
 
-    GLsizei sizeof_mdi_commands = sizeof(MDI_commands);
+    GLsizei sizeof_mdi_commands = sizeof(DrawElementsIndirectCommand);
 
 public:
     SceneManager()
@@ -50,13 +50,13 @@ public:
         glDeleteVertexArrays(1, &MERGED_VAO);  // Free the root
     }
     // Create entity with raw pointers for performance
-    void createEntity(entities_type l_type, scene_node* l_parent = nullptr , size_t num_instnace =1) {
+    void createEntity(entities_type l_type,std::string shapeName, size_t num_instnace = 1, scene_node* l_parent = nullptr ) {
         // Allocate scene_node on the stack for better performance
         ENTITY temp = ENTITY(id_generator.create_id(),l_type );
-        if (l_parent->entity.type == DYNAMIC && num_instnace== 1)temp.type = DYNAMIC;
+        if (l_parent != nullptr && l_parent->entity.type == DYNAMIC)temp.type = DYNAMIC;
 
         // Mark entry with temp entity
-        Component_UNIT.markEntry(temp,"CUBE",num_instnace);
+        Component_UNIT.markEntry(temp,shapeName,num_instnace);
 
         scene_node* new_node = new scene_node(temp);
 
@@ -88,8 +88,8 @@ public:
     void InitializeData() {
         //baadme isse public private dekhna abhi public maanke chal
 
-        size_t TOTAL_VERTEX = Component_UNIT.next_MERGED_MDI_CMD.base_vertex;
-        size_t TOTAL_INDEX = Component_UNIT.next_MERGED_MDI_CMD.base_index;
+        size_t TOTAL_VERTEX = Component_UNIT.next_MERGED_MDI_CMD.baseVertex;
+        size_t TOTAL_INDEX = Component_UNIT.next_MERGED_MDI_CMD.firstIndex;
 
         std::vector<VERTEX> vertices(TOTAL_VERTEX);
         // Ensure the vector has enough space, if base_vertex is calculated incorrectly
@@ -169,9 +169,14 @@ public:
 
         //link Commandbuffer to VAO
 
+
+
+
+
         NUM_MERGED_CMD = Component_UNIT.STORAGE.indirect_commands_data.size();
-        glCreateBuffers(1, &MERGED_MDI_COMMAND);
-        glNamedBufferData(MERGED_MDI_COMMAND, sizeof(MDI_commands) * NUM_MERGED_CMD ,
+        glGenBuffers(1, &MERGED_MDI_COMMAND);
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
+        glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof_mdi_commands * NUM_MERGED_CMD ,
             Component_UNIT.STORAGE.indirect_commands_data.data(), GL_DYNAMIC_STORAGE_BIT);
         
     }

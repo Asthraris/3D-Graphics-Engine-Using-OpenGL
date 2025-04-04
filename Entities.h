@@ -3,7 +3,7 @@
 #include <deque>
 #include <map>
 #include <string>
-
+#include <iostream>
 #include "Shape.h"
 #include "Shape_Library.h"
 enum entities_type{
@@ -21,18 +21,18 @@ struct ENTITY {
 };
 
 //used for telling metadata for huge buffers to gpu instaed of calling multiple draw calls with offset
-struct MDI_commands {
-	size_t index_count;
-	size_t instance_count;
-	size_t base_index;
-	size_t base_vertex;
-	size_t base_instance;
+struct DrawElementsIndirectCommand {
+    GLuint count;         // Number of indices
+    GLuint instanceCount; // Number of instances
+    GLuint firstIndex;    // Offset into the element array buffer
+    GLint baseVertex;     // Offset to the first vertex
+    GLuint baseInstance;  // REQUIRED for gl_BaseInstance!
 };
 
 struct MERGED_entity_renderer_data {
     std::vector<glm::mat4> transform_data;
     std::vector< std::shared_ptr<Shape>> Shape_data;
-    std::vector< MDI_commands> indirect_commands_data;
+    std::vector< DrawElementsIndirectCommand> indirect_commands_data;
 };
 
 
@@ -45,7 +45,7 @@ private:
 public:
 
     //holds next base loaction to directly assign them with comm_map of 
-    MDI_commands next_MERGED_MDI_CMD;
+    DrawElementsIndirectCommand next_MERGED_MDI_CMD;
     
     //REAL DATA STORAGE BLOCKS
     MERGED_entity_renderer_data STORAGE;
@@ -58,7 +58,13 @@ public:
 
         s_library = ShapeLibrary();
     }
-
+    void DEBUG_printCommand(const DrawElementsIndirectCommand cmd) {
+        std::cout << "Count: " << cmd.count
+            << ", Instances: " << cmd.instanceCount
+            << ", First Index: " << cmd.firstIndex
+            << ", Base Vertex: " << cmd.baseVertex
+            << ", Base Instance: " << cmd.baseInstance << std::endl;
+    }
 
     void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1, const glm::mat4& l_model = glm::mat4(1.0)) {
 
@@ -67,15 +73,15 @@ public:
         size_t num_verts = Storedsh->vertices.size();
 
         // Compute offsets BEFORE updating the map
-        MDI_commands currentCmd = {
+        DrawElementsIndirectCommand currentCmd = {
             num_inds, num_inst,
-            next_MERGED_MDI_CMD.base_index,    // Use existing offset
-            next_MERGED_MDI_CMD.base_vertex,
-            next_MERGED_MDI_CMD.base_instance
+            next_MERGED_MDI_CMD.firstIndex,    // Use existing offset
+            next_MERGED_MDI_CMD.baseVertex,
+            next_MERGED_MDI_CMD.baseInstance
         };
+        //DEBUG_printCommand(currentCmd);
 
-
-        STORAGE.indirect_commands_data[l_en.id] = currentCmd;
+        STORAGE.indirect_commands_data.emplace_back(currentCmd);
 
         STORAGE.Shape_data.push_back(Storedsh);
         for (size_t i = 0; i < num_inst; i++)
@@ -84,9 +90,9 @@ public:
         }
 
         // Update offsets for next entry
-        next_MERGED_MDI_CMD.base_index += num_inds;
-        next_MERGED_MDI_CMD.base_vertex += num_verts;
-        next_MERGED_MDI_CMD.base_instance += num_inst;
+        next_MERGED_MDI_CMD.firstIndex += num_inds;
+        next_MERGED_MDI_CMD.baseVertex += num_verts;
+        next_MERGED_MDI_CMD.baseInstance += num_inst;
 
     }
 };

@@ -31,7 +31,6 @@ LightManager::LightManager(int maxLIGHT):MAX_LIGHTS(maxLIGHT){
 	glGenBuffers(1, &lightUBO);
 	glBindBuffer(GL_UNIFORM_BUFFER, lightUBO);
 	glBufferData(GL_UNIFORM_BUFFER, sizeof(light) * MAX_LIGHTS, nullptr, GL_DYNAMIC_DRAW);
-	glBindBufferRange(GL_UNIFORM_BUFFER, 0, lightUBO, 0, sizeof(light) * MAX_LIGHTS);
 	glBindBufferBase(GL_UNIFORM_BUFFER, 0, lightUBO);
 }
 

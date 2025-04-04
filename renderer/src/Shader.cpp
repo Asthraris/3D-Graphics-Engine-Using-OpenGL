@@ -59,6 +59,7 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 		glShaderSource(vertId, 1, &vertstr, nullptr);
 		//creates an executable file for gpu to execute
 		glCompileShader(vertId);
+
 		PrintError(vertId);
 
 		fragId = glCreateShader(GL_FRAGMENT_SHADER);
@@ -89,8 +90,6 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 	PROJ_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "Proj_Matrix");
 	if (PROJ_MAT_LOC == -1)std::cout << " PERS not found\n";
 
-	MODEL_MAT_LOC = glGetUniformLocation(PROGRAM_ID, "Model_Matrix");
-	if (MODEL_MAT_LOC == -1)std::cout << " MOdel not found\n";
 
 	NUM_LIGHTS_LOC = glGetUniformLocation(PROGRAM_ID, "NUM_LIGHTS");
 	if (NUM_LIGHTS_LOC == -1)std::cout << " NUM_lightnot found\n";
@@ -119,11 +118,6 @@ void Shader::projMatrix(const float* Value)
 void Shader::viewMatrix(const float* Value)
 {
 	glUniformMatrix4fv(VIEW_MAT_LOC, 1, GL_FALSE,Value);
-}
-
-void Shader::UpdateModelMatrix(const float* Value)
-{
-	glUniformMatrix4fv(MODEL_MAT_LOC, 1, GL_FALSE, Value);
 }
 
 void Shader::UpdateNUM_LIGHTS(const int num_lights)

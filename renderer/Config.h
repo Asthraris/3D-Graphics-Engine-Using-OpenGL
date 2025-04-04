@@ -62,7 +62,6 @@ public:
 		glGenBuffers(1, &configUBO);
 		glBindBuffer(GL_UNIFORM_BUFFER, configUBO);
 		glBufferData(GL_UNIFORM_BUFFER, sizeof(envConfigUniform), &env, GL_DYNAMIC_DRAW);
-		glBindBufferRange(GL_UNIFORM_BUFFER, 1, configUBO, 0, sizeof(envConfigUniform));
 		glBindBufferBase(GL_UNIFORM_BUFFER, 1, configUBO);
 	}
 	void check4Change() {

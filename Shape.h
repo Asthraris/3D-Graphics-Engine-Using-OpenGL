@@ -6,7 +6,6 @@
 //for using memcpy for faster copying vertex data to shape
 #include <cstring>
 #include <iostream>
-#include "renderer/terrain/terrain_vertex.h"
 
 struct VERTEX {
 	glm::vec3 POS;
@@ -42,20 +41,5 @@ public:
 
 
 
-class Terrain_Shape
-{
-private:
-	unsigned int VAO, VBO , EBO;
-	terrain_VERTEX* vertices;
-	unsigned short* indices;
-	int num_verts;
-	int num_inds;
-public:
-	int LOD;
-	Terrain_Shape();
-	~Terrain_Shape();
-	void Update(terrain_VERTEX* vert,int nv,unsigned short* ind,int ni);
-	void render();
-	void send();
-};
+
 
