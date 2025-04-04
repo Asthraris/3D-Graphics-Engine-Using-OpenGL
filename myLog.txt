@@ -18,5 +18,5 @@ Updating the light uniform block every frame takes away 400 fPS which is quite m
 
 calibrate details about perlin octaves 
 
-
+TIP >>>> ADD DEFINE GLERROR CHECKER which tells the error causing location where that call is done
 NEXT JOB ->>> MAKE ALL GL commands in Renderer and Separate it form sceneManager -usme data upadate hoga but not Gl stuff abhi ke liye mene sceneManger me hi kar diya

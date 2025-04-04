@@ -4,6 +4,18 @@
 #include "Entities.h"
 #include "renderer/src/Shader.h"
 
+
+//DEBUG
+#include <iostream>
+#define GL_CHECK_ERROR() \
+    { \
+        GLenum err; \
+        while ((err = glGetError()) != GL_NO_ERROR) { \
+            std::cerr << "OpenGL Error " << err << " at " << __FILE__ << ":" << __LINE__ << std::endl; \
+        } \
+    }
+
+
 struct scene_node {
     ENTITY entity;
     std::vector<scene_node*> Childrens;  // Use raw pointers for performance
@@ -42,7 +54,6 @@ public:
         //unlike glgenvertexarray it creates and binda automatically
         //for required now but using DSA method
         glCreateVertexArrays(1, &MERGED_VAO);
-        glBindBufferBase(GL_SHADER_STORAGE_BLOCK, BINDIND_INDX_INST, MERGED_MODEL_SSBO);
 
     }
     ~SceneManager() {
@@ -79,6 +90,8 @@ public:
         
         
         glBindVertexArray(MERGED_VAO);
+        glBindBufferBase(GL_SHADER_STORAGE_BLOCK, BINDIND_INDX_INST, MERGED_MODEL_SSBO);
+
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
         
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_MERGED_CMD, sizeof_mdi_commands);
@@ -90,6 +103,11 @@ public:
 
         size_t TOTAL_VERTEX = Component_UNIT.next_MERGED_MDI_CMD.baseVertex;
         size_t TOTAL_INDEX = Component_UNIT.next_MERGED_MDI_CMD.firstIndex;
+
+        std::cout << "TOTAL_VERTEX: " << TOTAL_VERTEX << std::endl;
+        std::cout << "TOTAL_INDEX: " << TOTAL_INDEX << std::endl;
+
+
 
         std::vector<VERTEX> vertices(TOTAL_VERTEX);
         // Ensure the vector has enough space, if base_vertex is calculated incorrectly
@@ -122,8 +140,9 @@ public:
             offset_inds += inds_size_bytes;
 
         }
-
-        
+        //DEBUG
+        if (vertices.empty())std::cout << "fuck verts\n";
+        if (indices.empty())std::cout << "fuck inds\n";
 
 
         //binding the vAO before creation so i dont need to bind buffer again
@@ -133,6 +152,7 @@ public:
         //linking not sure where this should be
 
         //ek baar hi set karnega as bining index 0 par ab kaam hoga with stride as vertexsize
+
         glVertexArrayVertexBuffer(MERGED_VAO, 0, VBO, 0, sizeof(VERTEX)); // OpenGL 4.5
 
         
@@ -156,7 +176,6 @@ public:
         glCreateBuffers(1, &IBO);
         glNamedBufferData(IBO, TOTAL_INDEX * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
         glVertexArrayElementBuffer(MERGED_VAO, IBO);
-
         /*
         
         FOR NOW I HAVE MAKE IT FIXED SIZE BEFORE COMPIALATION SIZE 
@@ -164,9 +183,8 @@ public:
         
         */
         glCreateBuffers(1, &MERGED_MODEL_SSBO);
-        glNamedBufferStorage(MERGED_MODEL_SSBO, Component_UNIT.STORAGE.transform_data.size(), Component_UNIT.STORAGE.transform_data.data(),GL_DYNAMIC_STORAGE_BIT);
+        glNamedBufferStorage(MERGED_MODEL_SSBO, Component_UNIT.STORAGE.transform_data.size()*sizeof(glm::mat4), Component_UNIT.STORAGE.transform_data.data(), GL_DYNAMIC_STORAGE_BIT);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, BINDIND_INDX_INST, MERGED_MODEL_SSBO);
-
         //link Commandbuffer to VAO
 
 
@@ -177,8 +195,7 @@ public:
         glGenBuffers(1, &MERGED_MDI_COMMAND);
         glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
         glBufferData(GL_DRAW_INDIRECT_BUFFER, sizeof_mdi_commands * NUM_MERGED_CMD ,
-            Component_UNIT.STORAGE.indirect_commands_data.data(), GL_DYNAMIC_STORAGE_BIT);
-        
+            Component_UNIT.STORAGE.indirect_commands_data.data(), GL_STATIC_DRAW);
     }
 private:
     // Recursive function to free all nodes

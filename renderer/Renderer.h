@@ -33,6 +33,7 @@ private:
 	void IMGUI_RENDER(int);
 	void IMGUI_DESTROY();
 	
+	bool DEBUGfirstrun = true;
 
 public:
 	Renderer(LEVEL,std::unique_ptr <WINDOW>);

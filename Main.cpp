@@ -7,8 +7,8 @@
 int main() {
 
 	std::unique_ptr<WINDOW> win = std::make_unique<WINDOW>();
-	win->width = 1080;
-	win->height = 720;
+	win->width = 1920;
+	win->height = 1080;
 	win->name = "HELLO";
 	Renderer Sigma(godot,std::move(win));
 

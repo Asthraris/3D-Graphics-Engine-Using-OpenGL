@@ -124,10 +124,7 @@ Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 	//for 3d rendering
 	glViewport(0, 0, win->width, win->height);
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_CULL_FACE);
-	glEnable(GL_ARB_draw_indirect);
 
-	glCullFace(GL_BACK);
 
 	IMGUI_INIT(win->ptr);
 	//making vertex as point  no fragment is running
@@ -138,7 +135,7 @@ Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
 	SHADER = new Shader("renderer/src/shaders/basic.vert", "renderer/src/shaders/basic.frag");
 	SCENE = new SceneManager();
 
-	std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+	//std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
 }
 
@@ -152,7 +149,6 @@ Renderer::~Renderer()
 void Renderer::Run()
 {
 	float deltaTime;
-	bool DEBUGfirstrun = true;
 
 	Camera cam(60.0f, 0.1f, 100.0f, float(win->width) / (float)win->height );
 
@@ -161,16 +157,16 @@ void Renderer::Run()
 	//keyboard event listener 
 	glfwSetKeyCallback(win->ptr, keyCallback);
 
-		//SLIDER DEBUG METER
-		if (DEBUGfirstrun)checkError();
-		DEBUGfirstrun = false;
-		//SLIDER DEBUG METER
-	SCENE->createEntity(STATIC,"CUBE");
+	SCENE->createEntity(STATIC,"SPHERE");
 	
 	
 
 
 	SCENE->InitializeData();
+		//SLIDER DEBUG METER
+		if (DEBUGfirstrun)checkError();
+		DEBUGfirstrun = false;
+		//SLIDER DEBUG METER
 	while (!glfwWindowShouldClose(win->ptr)) {
 		deltaTime = Timer();
 		//std::cout << 1.0/deltaTime << "\n";

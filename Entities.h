@@ -69,6 +69,7 @@ public:
     void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1, const glm::mat4& l_model = glm::mat4(1.0)) {
 
         auto Storedsh = s_library.getShapeData(shapeName);
+        if (Storedsh == nullptr)std::cout << "Shape pointer not fetched\n";
         size_t num_inds = Storedsh->indices.size();
         size_t num_verts = Storedsh->vertices.size();
 

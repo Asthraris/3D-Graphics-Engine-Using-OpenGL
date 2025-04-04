@@ -34,6 +34,7 @@ public:
 	Shape(const Shape& storedData) {
 		vertices = storedData.vertices; // Direct copy
 		indices = storedData.indices;   // Direct copy
+
 	}
 };
 
