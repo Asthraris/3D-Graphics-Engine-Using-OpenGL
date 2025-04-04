@@ -5,7 +5,6 @@
 #include <glad/glad.h>
 //for using memcpy for faster copying vertex data to shape
 #include <cstring>
-#include <iostream>
 
 struct VERTEX {
 	glm::vec3 POS;
@@ -27,7 +26,7 @@ public:
 	std::vector<VERTEX> vertices;
 	std::vector<unsigned short> indices;
 	Shape() {
-		std::cout << "Shape is Empty!\n";
+		
 	}
 
 	// Copy constructor (fixed, no unsafe memcpy)

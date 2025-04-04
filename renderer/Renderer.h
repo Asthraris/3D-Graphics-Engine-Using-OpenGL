@@ -29,15 +29,33 @@ private:
 
 	Shader* SHADER;
 	SceneManager* SCENE;
+	std::shared_ptr<ComponentManager> RENDERER_Component_UNIT;
+	//just to make renderer access data efficiently does need to fetch everytime from data
 	void IMGUI_INIT(GLFWwindow*);
 	void IMGUI_RENDER(int);
 	void IMGUI_DESTROY();
-	
 	bool DEBUGfirstrun = true;
+
+	/*--------------------Renderer stuffs -------------------*/
+	size_t NUM_MERGED_CMD;
+	//needed while we render 
+	unsigned int MERGED_VAO, MERGED_MDI_COMMAND, MERGED_MODEL_SSBO;
+
+	//for vertex buffer
+	unsigned int VBO;
+
+	//for index buffer
+	unsigned int IBO;
+	//i have decided i m going to use PERCISTNAT map
+	int BINDIND_INDX_INST = 0;
+
+	GLsizei sizeof_mdi_commands = sizeof(DrawElementsIndirectCommand);
 
 public:
 	Renderer(LEVEL,std::unique_ptr <WINDOW>);
 	~Renderer();
+	void Initialize(const std::shared_ptr<ComponentManager>& Component_UNIT);
 	void Run();
+	void finalMDIRender();
 };
 

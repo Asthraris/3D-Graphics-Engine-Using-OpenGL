@@ -7,17 +7,18 @@
 int main() {
 
 	std::unique_ptr<WINDOW> win = std::make_unique<WINDOW>();
-	win->width = 1920;
+	win->width = 720;
 	win->height = 1080;
 	win->name = "HELLO";
 	Renderer Sigma(godot,std::move(win));
 
 	//LEVEL OF DETAIL USING vertexdensity distortion
+	
 	Sigma.Run();
 	return 0;
 }
-
-
+//TODO_____>
+//mujhe gpu to gpu changes only renderer me chaiye
 //mene Shape.h ko alter kiya hai beacuse i need upgrading it for generatal shape not optinum for terrain now 
 //so Terrain ke liye bhi karna hoga 
 //abhi ke liye terrain work nahi hoga

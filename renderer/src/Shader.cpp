@@ -94,6 +94,10 @@ Shader::Shader(const char* Vertpath, const char* Fragpath){
 	NUM_LIGHTS_LOC = glGetUniformLocation(PROGRAM_ID, "NUM_LIGHTS");
 	if (NUM_LIGHTS_LOC == -1)std::cout << " NUM_lightnot found\n";
 	
+	CAM_POS_LOC = glGetUniformLocation(PROGRAM_ID, "CamPos");
+	if (CAM_POS_LOC == -1)std::cout << " Cam Pos not found\n";
+
+
 
 	LIGHT_BLOCK_LOC = glGetUniformBlockIndex(PROGRAM_ID, "LIGHTS");
 	glUniformBlockBinding(PROGRAM_ID, LIGHT_BLOCK_LOC, 0);
@@ -113,6 +117,10 @@ Shader::~Shader(){
 void Shader::projMatrix(const float* Value)
 {
 	glUniformMatrix4fv(PROJ_MAT_LOC, 1, GL_FALSE, Value);
+}
+void Shader::UpdateCamPos(glm::vec3 Value)
+{
+	glUniform3f(CAM_POS_LOC, Value.x, Value.y, Value.z);
 }
 //kyuki me camera toh obviauslly banane wala hu so why not store the loc value in shader object
 void Shader::viewMatrix(const float* Value)

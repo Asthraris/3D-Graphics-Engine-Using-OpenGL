@@ -45,7 +45,7 @@ float* Camera::renderView(){
 	return glm::value_ptr(VIEW_MAT);
 }
 
-void Camera::Move(const float deltaTime,GLFWwindow* window)
+glm::vec3 Camera::Move(const float deltaTime,GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		POSITION_VECTOR += SPEED * FOCUS_VECTOR * deltaTime;
@@ -71,6 +71,7 @@ void Camera::Move(const float deltaTime,GLFWwindow* window)
 
 	}
 	CAM_CHUNK = glm::vec2((POSITION_VECTOR.x / CHUNK_SIZE), (POSITION_VECTOR.z / CHUNK_SIZE));
+	return POSITION_VECTOR;
 }
 
 void Camera::Look(const float deltaTime, GLFWwindow* window) {

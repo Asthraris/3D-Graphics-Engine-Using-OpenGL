@@ -15,6 +15,8 @@ struct light {
 };
 
 uniform int NUM_LIGHTS;
+uniform vec3 CamPos; // Camera position
+uniform float specularStrength = 2; // Strength of specular lighting
 
 layout(std140, binding=1) uniform SETTINGS {
     float ambient;
@@ -30,19 +32,32 @@ layout(std140, binding=0) uniform LIGHTS {
 
 vec3 CalcLighting(vec3 normal, vec3 fragPos) {
     vec3 result = vec3(0.0);
+    int SHINY_FACTOR = 16;
+    vec3 viewDir = normalize(CamPos - fragPos); // View direction
+
     for (int i = 0; i < NUM_LIGHTS; i++) {
+        vec3 lightDir;
+        float attenuation = 1.0;
+
         if (Lights[i].Type == 0) { // Directional light
-            vec3 lightDir = normalize(-Lights[i].Pos);
-            float diff = max(dot(normal, lightDir), 0.0);
-            result += Lights[i].lightColor * Lights[i].Intensity * diff;
+            lightDir = normalize(-Lights[i].Pos);
         } else { // Point light
-            vec3 lightDir = normalize(Lights[i].Pos - fragPos);
-            float diff = max(dot(normal, lightDir), 0.0);
+            lightDir = normalize(Lights[i].Pos - fragPos);
             float dist = length(Lights[i].Pos - fragPos);
-            float attenuation = 1.0 / (1.0 + 0.09 * dist + 0.032 * (dist * dist));
-            result += Lights[i].lightColor * Lights[i].Intensity * diff * attenuation;
+            attenuation = 1.0 / (1.0 + 0.09 * dist + 0.032 * (dist * dist));
         }
+
+        // Diffuse lighting
+        float diff = max(dot(normal, lightDir), 0.0);
+
+        // Specular lighting (Blinn-Phong)
+        vec3 halfwayDir = normalize(lightDir + viewDir);
+        float spec = pow(max(dot(normal, halfwayDir), 0.0), SHINY_FACTOR); // Shininess factor
+
+        vec3 lightEffect = Lights[i].lightColor * Lights[i].Intensity * attenuation;
+        result += lightEffect * (diff + specularStrength * spec);
     }
+    
     return result + vec3(ambient);
 }
 
