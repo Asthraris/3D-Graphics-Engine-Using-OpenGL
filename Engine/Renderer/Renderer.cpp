@@ -1,6 +1,6 @@
-#include "Renderer.h"
+#include "Renderer.hpp"
 
-#include "../Camera.h"
+
 
 
 //for debug model mat
@@ -46,7 +46,7 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 
-void Renderer::IMGUI_INIT(GLFWwindow* window_ptr)
+void rend::Renderer::IMGUI_INIT(GLFWwindow* window_ptr)
 {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -57,7 +57,7 @@ void Renderer::IMGUI_INIT(GLFWwindow* window_ptr)
 	ImGui_ImplOpenGL3_Init("#version 460");
 }
 
-void Renderer::IMGUI_RENDER(int fps)
+void rend::Renderer::IMGUI_RENDER(int fps)
 {
 	// Start the ImGui frame
 	ImGui_ImplOpenGL3_NewFrame();
@@ -68,21 +68,15 @@ void Renderer::IMGUI_RENDER(int fps)
 	//idhar hamne ek window ka segment create kiyawith name this {if want to create more window seg. copy from this}
 	ImGui::Begin("3D Renderer By Aman Gupta!");
 	ImGui::Text("fps meter: %d",fps);
-	ImGui::ColorEdit3("bg-Color", settings.sky);
+	ImGui::ColorEdit3("bg-Color", a_settings.background);
 	ImGui::Text("Render distance:");
-	ImGui::SliderInt("render", &settings.render_distance, 1, 10);
-	ImGui::SliderInt("LOD", &settings.level_of_detail, 1, 10);
-	ImGui::Text("ENVIORNMENT");
-	ImGui::SliderFloat("Ambient Light", &settings.env.ambient, 0.0f, 1.0f);
-	ImGui::Checkbox("Enable Lighting", (bool*)&settings.env.light_enable);
-	ImGui::Checkbox("Enable Fog", (bool*)&settings.env.fog_enable);
-	
-	ImGui::ColorEdit3("Fog Color", &settings.env.fog_color.x);
-	ImGui::SliderFloat("Fog Density", &settings.env.fog_density, 0.0f, 0.5f);
-	
+	ImGui::SliderInt("render", &a_settings.render_distance, 1, 10);
+	ImGui::SliderInt("LOD", &a_settings.level_of_detail, 1, 10);
 
 
-	//ImGui::SliderInt("PERLIN", &TERR_PER, 1, 10);
+	ImGui::Text("DISPLAY");
+	ImGui::Checkbox("ENABLE LIGHTS", &a_settings.env.light_enable);
+	ImGui::SliderFloat("Ambient Light", &a_settings.env.ambient, 0.0f, 1.0f);
 	
 
 
@@ -90,14 +84,14 @@ void Renderer::IMGUI_RENDER(int fps)
 
 	ImGui::End();
 
-	Aura.IMGUI_RENDER();
+	a_aura.IMGUI_RENDER();
 
 	// Render ImGui
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-void Renderer::IMGUI_DESTROY(){
+void rend::Renderer::IMGUI_DESTROY(){
 	ImGui_ImplOpenGL3_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
@@ -105,39 +99,43 @@ void Renderer::IMGUI_DESTROY(){
 
 
 
-Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):win(std::move(ptr)) {
+rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move(ptr)) {
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	win->construct();
-	glfwMakeContextCurrent(win->ptr);
+	a_win->construct();
+	glfwMakeContextCurrent(a_win->ptr);
 	//glfw se humne glad procedure address liya fir typecast kiya to glad provided script then load kiya into glad
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	//for 3d rendering
-	glViewport(0, 0, win->width, win->height);
+	glViewport(0, 0, a_win->width, a_win->height);
 	glEnable(GL_DEPTH_TEST);
 
 
-	IMGUI_INIT(win->ptr);
+	IMGUI_INIT(a_win->ptr);
 	
-	settings = CONFIG(lvl);
-	Aura = LightManager(3);
+	a_settings = CONFIG(lvl);
+	a_aura = LightManager(3);
 
-	SHADER = new Shader("renderer/src/shaders/basic.vert", "renderer/src/shaders/basic.frag");
-	SCENE = new SceneManager();
+	a_shader = new Shader("Engine/Renderer/src/shaders/basic.vert", "Engine/Renderer/src/shaders/basic.frag");
+	a_scene = new eng::SceneManager();
+
+	a_editCam = new eng::ArcBall(60.0f, 0.1f, 100.0f, float(a_win->width) / (float)a_win->height);
+
 	glCreateVertexArrays(1, &MERGED_VAO);
+
 }
 
-void Renderer::Initialize(const std::shared_ptr<ComponentManager>& Component_UNIT)
+void rend::Renderer::Initialize(const std::shared_ptr<eng::ComponentManager>& Component_UNIT)
 {
 	//baadme isse public private dekhna abhi public maanke chal
-	RENDERER_Component_UNIT = Component_UNIT;
+	a_component_UNIT = Component_UNIT;
 	
-	size_t TOTAL_VERTEX = RENDERER_Component_UNIT->next_MERGED_MDI_CMD.baseVertex;
-	size_t TOTAL_INDEX = RENDERER_Component_UNIT->next_MERGED_MDI_CMD.firstIndex;
+	size_t TOTAL_VERTEX = a_component_UNIT->next_MERGED_MDI_CMD.baseVertex;
+	size_t TOTAL_INDEX = a_component_UNIT->next_MERGED_MDI_CMD.firstIndex;
 
 
 
@@ -160,7 +158,7 @@ void Renderer::Initialize(const std::shared_ptr<ComponentManager>& Component_UNI
 	size_t offset_inds = 0;
 	size_t inds_size_bytes;
 
-	for (auto& shape_shr : RENDERER_Component_UNIT->STORAGE.Shape_data) {
+	for (auto& shape_shr : a_component_UNIT->STORAGE.Shape_data) {
 
 		vert_size_bytes = shape_shr->vertices.size() * sizeof(VERTEX);
 		inds_size_bytes = shape_shr->indices.size() * sizeof(unsigned short);
@@ -218,8 +216,8 @@ void Renderer::Initialize(const std::shared_ptr<ComponentManager>& Component_UNI
 	*/
 	glCreateBuffers(1, &MERGED_MODEL_SSBO);
 	glNamedBufferStorage(MERGED_MODEL_SSBO,
-		RENDERER_Component_UNIT->STORAGE.transform_data.size() * sizeof(glm::mat4),
-		RENDERER_Component_UNIT->STORAGE.transform_data.data(),
+		a_component_UNIT->STORAGE.transform_data.size() * sizeof(glm::mat4),
+		a_component_UNIT->STORAGE.transform_data.data(),
 		GL_DYNAMIC_STORAGE_BIT);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, BINDIND_INDX_INST, MERGED_MODEL_SSBO);
 	//link Commandbuffer to VAO
@@ -228,16 +226,16 @@ void Renderer::Initialize(const std::shared_ptr<ComponentManager>& Component_UNI
 
 
 
-	NUM_MERGED_CMD = RENDERER_Component_UNIT->STORAGE.indirect_commands_data.size();
+	NUM_MERGED_CMD = a_component_UNIT->STORAGE.indirect_commands_data.size();
 	glGenBuffers(1, &MERGED_MDI_COMMAND);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
 	glBufferData(GL_DRAW_INDIRECT_BUFFER,
 		sizeof_mdi_commands * NUM_MERGED_CMD,
-		RENDERER_Component_UNIT->STORAGE.indirect_commands_data.data(),
+		a_component_UNIT->STORAGE.indirect_commands_data.data(),
 		GL_STATIC_DRAW);
 }
 
-Renderer::~Renderer()
+rend::Renderer::~Renderer()
 {
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &IBO);
@@ -245,46 +243,49 @@ Renderer::~Renderer()
 	glDeleteBuffers(1, &MERGED_MODEL_SSBO);
 	glDeleteVertexArrays(1, &MERGED_VAO);
 	IMGUI_DESTROY();
-	glfwDestroyWindow(win->ptr);
+	glfwDestroyWindow(a_win->ptr);
 	glfwTerminate();
 }
 
-void Renderer::Run()
+void rend::Renderer::Run()
 {
 	float deltaTime;
 
-	Camera cam(60.0f, 0.1f, 100.0f, float(win->width) / (float)win->height );
+	 
 
 	//Terrain riverland;
 	// 
 	//keyboard event listener 
-	glfwSetKeyCallback(win->ptr, keyCallback);
+	glfwSetKeyCallback(a_win->ptr, keyCallback);
 
-	SCENE->createEntity(STATIC,"SPHERE");
-	
-	
+	a_scene->createEntity(STATIC,"SPHERE");
 
 
-	Initialize(SCENE->getComponent2GPU());
-	while (!glfwWindowShouldClose(win->ptr)) {
+	Initialize(a_scene->getComponent2GPU());
+	while (!glfwWindowShouldClose(a_win->ptr)) {
 		deltaTime = Timer();
 		//std::cout << 1.0/deltaTime << "\n";
-		settings.check4Change();
-		glClearColor(settings.sky[0], settings.sky[1], settings.sky[2], 1.0);
+		a_settings.check4Change();
+		glClearColor(a_settings.background[0], a_settings.background[1], a_settings.background[2], 1.0);
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//idhar camera move bhi horah hai fir uskA result ko update to gpu bhi kar raha hu
 		
-		SHADER->UpdateCamPos(cam.Move(deltaTime, win->ptr));
-		cam.Look(deltaTime, win->ptr);
 
-		SHADER->Activate();
-		SHADER->viewMatrix(cam.renderView());
-		SHADER->projMatrix(cam.getProjMatrix());
-		SHADER->UpdateNUM_LIGHTS(Aura.NUM_LIGHTS);
+		a_shader->UpdateCamPos(a_editCam->Move(deltaTime, a_win->ptr));
+		//SLIDER DEBUG METER
+		if (DEBUGfirstrun)checkError();
+		DEBUGfirstrun = false;
+		//SLIDER DEBUG METER
+		a_editCam->Look(deltaTime, a_win->ptr);
+
+		a_shader->Activate();
+		a_shader->viewMatrix(a_editCam->renderView());
+		a_shader->projMatrix(a_editCam->getProjMatrix());
+		a_shader->UpdateNUM_LIGHTS(a_aura.NUM_LIGHTS);
 
 
-		SCENE->Update_Scene(deltaTime);
+		a_scene->Update_Scene(deltaTime);
 		//SCENE->Render_Scene();
 		//mere hussab se Ek hi pura shader switch insme hi rakhta hu or renderer mai ke unnessesary swich na ho
 
@@ -293,13 +294,8 @@ void Renderer::Run()
 
 		
 		//riverland.dynamicLoad(cam, Aura.NUM_LIGHTS, settings.render_distance, settings.level_of_detail);
-
-		//SLIDER DEBUG METER
-		if (DEBUGfirstrun)checkError();
-		DEBUGfirstrun = false;
-		//SLIDER DEBUG METER
 		IMGUI_RENDER(int(1/deltaTime));
-		glfwSwapBuffers(win->ptr);
+		glfwSwapBuffers(a_win->ptr);
 
 		glfwPollEvents();
 
@@ -307,7 +303,7 @@ void Renderer::Run()
 	}
 }
 
-void Renderer::finalMDIRender()
+void rend::Renderer::finalMDIRender()
 {
 	glBindVertexArray(MERGED_VAO);
 	

@@ -1,24 +1,17 @@
 #pragma once
-#include <vector>
-#include <deque>
-#include <map>
-#include <string>
-#include <iostream>
-#include "Shape.h"
-#include "Shape_Library.h"
-enum entities_type{
-	STATIC,
-	DYNAMIC,
-	INSTANCED,
-	LIGHT,
-	PARTICLES
-};//type wala system ko mene drop kardiya balki ab me persistant map use karunga for instnace sso no need to make dynamic buffer,aur vese bhu vertex and index data kaha update hota hai {baad me usse bhi dynamic kar dunga for addition of entity on runtime}
 
-struct ENTITY {
-    uint32_t id;
-    entities_type type;
-    ENTITY(uint32_t l_id,entities_type l_type):id(l_id),type(l_type){}
-};
+#include <glad/glad.h>
+#include <glm/glm.hpp>
+
+//DEBUG
+#include <iostream>
+
+//user
+#include "Entities.hpp"
+#include "Shape_Library.hpp"
+#include "Shape.hpp"
+
+
 
 //used for telling metadata for huge buffers to gpu instaed of calling multiple draw calls with offset
 struct DrawElementsIndirectCommand {
@@ -36,6 +29,7 @@ struct MERGED_entity_renderer_data {
 };
 
 
+namespace eng {
 
 class ComponentManager {
 private:
@@ -46,13 +40,13 @@ public:
 
     //holds next base loaction to directly assign them with comm_map of 
     DrawElementsIndirectCommand next_MERGED_MDI_CMD;
-    
+
     //REAL DATA STORAGE BLOCKS
     MERGED_entity_renderer_data STORAGE;
     //ye func jo enity factory se create hoga uske properties ko strore bas karega entity creation is hendeld by factory
 
     ComponentManager() {
-        
+
         //instance me hume instance count sppecify karna hoga
         next_MERGED_MDI_CMD = { 0,0,0,0,0 };
 
@@ -97,27 +91,4 @@ public:
 
     }
 };
-
-
-
-// ye enity create karega and their components ko bhi and strore karega in Comonents manger me 
-class EntitiesIDGenerator {
-private:
-    uint32_t id_counter = 1;          // ID counter
-    
-public:
-    uint32_t create_id() {
-        return id_counter++;
-    }
-
-    void destroy_id(uint32_t id) {
-                      //  Recycle ID
-    }
-
-    void reset() {
-        id_counter = 1;
-    }
-};
-
-
-
+}

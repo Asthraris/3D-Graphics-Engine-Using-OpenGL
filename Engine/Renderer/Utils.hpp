@@ -12,19 +12,14 @@ enum LEVEL {
 	unity = 1,
 	godot =2
 };
+//edit window me fog ki jarurat nhi 
 struct envConfigUniform {
 	float ambient = 0.0;               // 4 bytes
-	int light_enable =1;            // 4 bytes (use int instead of bool)
-	int fog_enable =1;              // 4 bytes (use int instead of bool)
-	float fog_density = 0.005;           // 4 bytes
+	bool light_enable =true;            // 4 bytes (use int instead of bool)
 	alignas(16) glm::vec3 fog_color = glm::vec3(1.0);
 
 	bool operator==(const envConfigUniform& other) const {
-		return fog_enable == other.fog_enable &&
-			std::fabs(fog_density - other.fog_density) < 1e-4f &&  // Floating point comparison
-			std::fabs(fog_color[0] - other.fog_color[0]) < 1e-4f &&
-			std::fabs(fog_color[1] - other.fog_color[1]) < 1e-4f &&
-			std::fabs(fog_color[2] - other.fog_color[2]) < 1e-4f &&
+		return 
 			std::fabs(ambient - other.ambient) < 1e-4f &&
 			light_enable == other.light_enable;
 	}
@@ -36,7 +31,7 @@ private:
 	unsigned int configUBO;
 public:
 	envConfigUniform env;
-	float sky[3] = {0.0,0.0,0.0};
+	float background[3] = {0.0,0.0,0.0};
 	int render_distance;
 	int level_of_detail;
 	float Gravity = 10.0;
@@ -85,12 +80,7 @@ public:
 			std::memcpy(&fetchedData, ptr, sizeof(envConfigUniform));
 
 			std::cout << "==== UBO DATA ====" << std::endl;
-			std::cout << "Fog Enable: "  << fetchedData.fog_enable << std::endl;
-			std::cout << "Fog Density: " << fetchedData.fog_density << std::endl;
-			std::cout << "Fog Color: ("
-				<< fetchedData.fog_color[0] << ", "
-				<< fetchedData.fog_color[1] << ", "
-				<< fetchedData.fog_color[2] << ")" << std::endl;
+
 			std::cout << "Ambient: " << fetchedData.ambient << std::endl;
 			std::cout << "Light Enable: " << std::boolalpha << fetchedData.light_enable << std::endl;
 

@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "Shader.hpp"
 
 #include <glad/glad.h>
 //for loading for path
@@ -118,7 +118,7 @@ void Shader::projMatrix(const float* Value)
 {
 	glUniformMatrix4fv(PROJ_MAT_LOC, 1, GL_FALSE, Value);
 }
-void Shader::UpdateCamPos(glm::vec3 Value)
+void Shader::UpdateCamPos(const glm::vec3& Value)
 {
 	glUniform3f(CAM_POS_LOC, Value.x, Value.y, Value.z);
 }

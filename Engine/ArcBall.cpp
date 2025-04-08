@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "ArcBall.hpp"
 
 
 
@@ -6,8 +6,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/matrix.hpp>
 
-#define CHUNK_SIZE 8
-//for upadting matix
+
 
 
 
@@ -17,8 +16,7 @@ const float SENSITIVITY = 90.0f;
 bool FIRST_MOVE = true;
 
 
-Camera::Camera(float fov, float near, float far, float Aspectrat) :
-	CAM_CHUNK ( glm::vec2(0.0)),
+eng::ArcBall::ArcBall(float fov, float near, float far, float Aspectrat) :
 	FIELD_OF_VIEW(glm::radians(fov)),
 	NEAR_PLANE(near),
 	FAR_PLANE(far),
@@ -32,12 +30,12 @@ Camera::Camera(float fov, float near, float far, float Aspectrat) :
 	PERSPECTIVE_MAT = glm::perspective(FIELD_OF_VIEW,ASPECT_RATIO,NEAR_PLANE,FAR_PLANE);
 }
 
-Camera::~Camera()
+eng::ArcBall::~ArcBall()
 {
 	
 }
 
-float* Camera::renderView(){
+float* eng::ArcBall::renderView(){
 	
 	VIEW_MAT = glm::mat4(1.0f);
 	VIEW_MAT = glm::lookAt(POSITION_VECTOR,POSITION_VECTOR+ FOCUS_VECTOR, UP_VECTOR);
@@ -45,7 +43,7 @@ float* Camera::renderView(){
 	return glm::value_ptr(VIEW_MAT);
 }
 
-glm::vec3 Camera::Move(const float deltaTime,GLFWwindow* window)
+glm::vec3 eng::ArcBall::Move(const float deltaTime,GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
 		POSITION_VECTOR += SPEED * FOCUS_VECTOR * deltaTime;
@@ -70,11 +68,11 @@ glm::vec3 Camera::Move(const float deltaTime,GLFWwindow* window)
 		POSITION_VECTOR += SPEED * (-UP_VECTOR) * deltaTime;
 
 	}
-	CAM_CHUNK = glm::vec2((POSITION_VECTOR.x / CHUNK_SIZE), (POSITION_VECTOR.z / CHUNK_SIZE));
+	
 	return POSITION_VECTOR;
 }
 
-void Camera::Look(const float deltaTime, GLFWwindow* window) {
+void eng::ArcBall::Look(const float deltaTime, GLFWwindow* window) {
 	static double lastMousePos_X = 0.0f;
 	static double lastMousePos_Y = 0.0f;
 	static float YAW = -90.0f;
@@ -118,12 +116,10 @@ void Camera::Look(const float deltaTime, GLFWwindow* window) {
 	lastMousePos_Y = currMousePos_Y;
 }
 
-float* Camera::getProjMatrix()
+float* eng::ArcBall::getProjMatrix()
 {
 	return glm::value_ptr(PERSPECTIVE_MAT);
 }
 
-glm::vec2 Camera::giveCamChunk(){
-	return CAM_CHUNK;
-}
+
 

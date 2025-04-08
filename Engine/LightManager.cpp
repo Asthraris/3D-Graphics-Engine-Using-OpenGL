@@ -1,4 +1,4 @@
-#include "LightManager.h"
+#include "LightManager.hpp"
 
 #include <glad/glad.h>
 

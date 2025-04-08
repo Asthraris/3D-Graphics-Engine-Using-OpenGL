@@ -21,9 +21,6 @@ uniform float specularStrength = 2; // Strength of specular lighting
 layout(std140, binding=1) uniform SETTINGS {
     float ambient;
     int light_enable;
-    int fog_enable;
-    float fog_density;
-    vec3 fog_color;
 };
 
 layout(std140, binding=0) uniform LIGHTS {
@@ -61,9 +58,7 @@ vec3 CalcLighting(vec3 normal, vec3 fragPos) {
     return result + vec3(ambient);
 }
 
-float CalcFoginess(float depth) {
-    return clamp(exp(-fog_density * depth), 0.0, 1.0);
-}
+
 
 void main() {
     vec3 normal = normalize(Normal);
@@ -74,9 +69,6 @@ void main() {
         final *= litness;
     }
 
-    if (fog_enable != 0) {
-        final = mix(fog_color, final, CalcFoginess(ViewDepth));
-    }
 
     OUTPUT = vec4(final, 1.0); // Output corrected color
 }

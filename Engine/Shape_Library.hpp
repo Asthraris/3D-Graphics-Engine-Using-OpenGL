@@ -4,12 +4,14 @@
 #include <string>
 #include <memory>  // For shared_ptr
 
-#include "Shape.h"
+
+#include "Shape.hpp"
 
 constexpr double PI = 3.14159265358979323846;
 constexpr double TWO_PI = 2.0 * PI;
 
 
+namespace eng {
 
 class ShapeLibrary {
 	std::unordered_map<std::string, std::shared_ptr<Shape>> StoredShapes;
@@ -198,3 +200,4 @@ public:
 
 
 };
+}
