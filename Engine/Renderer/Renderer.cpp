@@ -46,6 +46,8 @@ void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 }
 
 
+
+
 void rend::Renderer::IMGUI_INIT(GLFWwindow* window_ptr)
 {
 	IMGUI_CHECKVERSION();
@@ -99,6 +101,14 @@ void rend::Renderer::IMGUI_DESTROY(){
 
 
 
+void rend::Renderer::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+	Renderer* renderer = static_cast<Renderer*>(glfwGetWindowUserPointer(window));
+	if (renderer && renderer->a_editCam) {
+		renderer->a_editCam->setScrollDelta(static_cast<float>(yoffset));
+	}
+}
+
 rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move(ptr)) {
 	//OPENGL -4.5 version with directStateAccess
 	glfwInit();
@@ -111,6 +121,11 @@ rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move
 	//glfw se humne glad procedure address liya fir typecast kiya to glad provided script then load kiya into glad
 	gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
 	//for 3d rendering
+
+
+	//this func gives access to renderer class to glfw
+	glfwSetWindowUserPointer(a_win->ptr, this);
+
 	glViewport(0, 0, a_win->width, a_win->height);
 	glEnable(GL_DEPTH_TEST);
 
@@ -122,8 +137,8 @@ rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move
 
 	a_shader = new Shader("Engine/Renderer/src/shaders/basic.vert", "Engine/Renderer/src/shaders/basic.frag");
 	a_scene = new eng::SceneManager();
-
-	a_editCam = new eng::ArcBall(60.0f, 0.1f, 100.0f, float(a_win->width) / (float)a_win->height);
+	//45 deg is ideal/ perfect for ORbit or editor style camera
+	a_editCam = new eng::ArcBall(45.0f, 0.1f, 40.0f, (float(a_win->width) / (float)a_win->height));
 
 	glCreateVertexArrays(1, &MERGED_VAO);
 
@@ -257,29 +272,28 @@ void rend::Renderer::Run()
 	// 
 	//keyboard event listener 
 	glfwSetKeyCallback(a_win->ptr, keyCallback);
+	glfwSetScrollCallback(a_win->ptr, rend::Renderer::scroll_callback);
 
-	a_scene->createEntity(STATIC,"SPHERE");
+	a_scene->createEntity(STATIC,"PLANE");
+	a_scene->createEntity(STATIC, "CUBE", 0);
+	a_scene->createEntity(STATIC, "SPHERE", 1);
 
 
 	Initialize(a_scene->getComponent2GPU());
 	while (!glfwWindowShouldClose(a_win->ptr)) {
 		deltaTime = Timer();
+		a_shader->Activate();
 		//std::cout << 1.0/deltaTime << "\n";
 		a_settings.check4Change();
 		glClearColor(a_settings.background[0], a_settings.background[1], a_settings.background[2], 1.0);
 		
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		//idhar camera move bhi horah hai fir uskA result ko update to gpu bhi kar raha hu
+		a_editCam->Update(a_win->ptr);
+		a_shader->UpdateCamPos(a_editCam->getCamPos());
+
 		
 
-		a_shader->UpdateCamPos(a_editCam->Move(deltaTime, a_win->ptr));
-		//SLIDER DEBUG METER
-		if (DEBUGfirstrun)checkError();
-		DEBUGfirstrun = false;
-		//SLIDER DEBUG METER
-		a_editCam->Look(deltaTime, a_win->ptr);
-
-		a_shader->Activate();
 		a_shader->viewMatrix(a_editCam->renderView());
 		a_shader->projMatrix(a_editCam->getProjMatrix());
 		a_shader->UpdateNUM_LIGHTS(a_aura.NUM_LIGHTS);
@@ -299,6 +313,10 @@ void rend::Renderer::Run()
 
 		glfwPollEvents();
 
+		//SLIDER DEBUG METER
+		if (DEBUGfirstrun)checkError();
+		DEBUGfirstrun = false;
+		//SLIDER DEBUG METER
 
 	}
 }

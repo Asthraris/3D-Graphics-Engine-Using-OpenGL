@@ -32,6 +32,9 @@ namespace eng{
         Shader* SHADER;
 
 
+        void setPropsforDynamic() {
+
+        }
 
     public:
         SceneManager()
@@ -42,14 +45,25 @@ namespace eng{
         ~SceneManager() {
             deleteScene(e_Root);
         }
+        scene_node* findNodeByID(scene_node* node, uint32_t id) {
+            if (!node) return nullptr;
+            if (node->entity.id == id) return node;
+
+            for (auto* child : node->Childrens) {
+                scene_node* result = findNodeByID(child, id);
+                if (result) return result;
+            }
+            return nullptr;
+        }
         // Create entity with raw pointers for performance
-        void createEntity(entities_type l_type, std::string shapeName, size_t num_instnace = 1, scene_node* l_parent = nullptr) {
+        void createEntity(entities_type l_type, std::string shapeName, uint32_t parent_id = -1, size_t num_instnace = 1 ,const glm::mat4& model=glm::mat4(1.0f))
+        {
             // Allocate scene_node on the stack for better performance
             ENTITY temp = ENTITY(id_generator.create_id(), l_type);
-            if (l_parent != nullptr && l_parent->entity.type == DYNAMIC)temp.type = DYNAMIC;
-
+            std::cout << temp.id << "\n";
+            scene_node* parent_scene = findNodeByID(e_Root, parent_id);
             // Mark entry with temp entity
-            Component_UNIT->markEntry(temp, shapeName, num_instnace);
+            Component_UNIT->markEntry(temp, shapeName, num_instnace, model);
 
             scene_node* new_node = new scene_node(temp);
 
@@ -57,8 +71,9 @@ namespace eng{
                 e_Root = new_node;  // Set the root
             }
             else {
-                l_parent->addChild(new_node);
+                parent_scene->addChild(new_node);
             }
+
         }
 
         //Later JOB

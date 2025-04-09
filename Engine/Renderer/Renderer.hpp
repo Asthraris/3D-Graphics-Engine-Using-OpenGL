@@ -38,7 +38,7 @@ namespace rend{
 		bool DEBUGfirstrun = true;
 
 		/*--------------------Renderer stuffs -------------------*/
-		size_t NUM_MERGED_CMD;
+		unsigned int NUM_MERGED_CMD;
 		//needed while we render 
 		unsigned int MERGED_VAO, MERGED_MDI_COMMAND, MERGED_MODEL_SSBO;
 
@@ -53,7 +53,7 @@ namespace rend{
 		GLsizei sizeof_mdi_commands = sizeof(DrawElementsIndirectCommand);
 
 		//-------------
-
+		static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 	public:
 		Renderer(LEVEL, std::unique_ptr <WINDOW>);
 		~Renderer();

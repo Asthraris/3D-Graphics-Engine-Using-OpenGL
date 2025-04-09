@@ -2,7 +2,7 @@
 
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
+#include <unordered_map>
 //DEBUG
 #include <iostream>
 
@@ -27,68 +27,80 @@ struct MERGED_entity_renderer_data {
     std::vector< std::shared_ptr<Shape>> Shape_data;
     std::vector< DrawElementsIndirectCommand> indirect_commands_data;
 };
+struct props_Locator {
+    uint32_t id;
+    uint32_t instance_index;
+    props_Locator(uint32_t l_id , uint32_t l_ist=0):id(l_id),instance_index(l_ist){}
+};
+struct DYNAMIC_entity_props {
+
+};
 
 
 namespace eng {
 
-class ComponentManager {
-private:
-    //HOLDS the every Shape recored
-    ShapeLibrary s_library;
+    class ComponentManager {
+    private:
+        //HOLDS the every Shape recored
+        ShapeLibrary s_library;
+    
+    public:
+    
+        //holds next base loaction to directly assign them with comm_map of 
+        DrawElementsIndirectCommand next_MERGED_MDI_CMD;
+    
+        //REAL DATA STORAGE BLOCKS
+        MERGED_entity_renderer_data STORAGE;
+        //ye func jo enity factory se create hoga uske properties ko strore bas karega entity   creation is hendeld by factory
 
-public:
+        //std::unordered_map < props_Locator, DYNAMIC_entity_props> PROPS_map;
 
-    //holds next base loaction to directly assign them with comm_map of 
-    DrawElementsIndirectCommand next_MERGED_MDI_CMD;
 
-    //REAL DATA STORAGE BLOCKS
-    MERGED_entity_renderer_data STORAGE;
-    //ye func jo enity factory se create hoga uske properties ko strore bas karega entity creation is hendeld by factory
-
-    ComponentManager() {
-
-        //instance me hume instance count sppecify karna hoga
-        next_MERGED_MDI_CMD = { 0,0,0,0,0 };
-
-        s_library = ShapeLibrary();
-    }
-    void DEBUG_printCommand(const DrawElementsIndirectCommand cmd) {
-        std::cout << "Count: " << cmd.count
-            << ", Instances: " << cmd.instanceCount
-            << ", First Index: " << cmd.firstIndex
-            << ", Base Vertex: " << cmd.baseVertex
-            << ", Base Instance: " << cmd.baseInstance << std::endl;
-    }
-
-    void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1, const glm::mat4& l_model = glm::mat4(1.0)) {
-
-        auto Storedsh = s_library.getShapeData(shapeName);
-        if (Storedsh == nullptr)std::cout << "Shape pointer not fetched\n";
-        size_t num_inds = Storedsh->indices.size();
-        size_t num_verts = Storedsh->vertices.size();
-
-        // Compute offsets BEFORE updating the map
-        DrawElementsIndirectCommand currentCmd = {
-            num_inds, num_inst,
-            next_MERGED_MDI_CMD.firstIndex,    // Use existing offset
-            next_MERGED_MDI_CMD.baseVertex,
-            next_MERGED_MDI_CMD.baseInstance
-        };
-        //DEBUG_printCommand(currentCmd);
-
-        STORAGE.indirect_commands_data.emplace_back(currentCmd);
-
-        STORAGE.Shape_data.push_back(Storedsh);
-        for (size_t i = 0; i < num_inst; i++)
-        {
-            STORAGE.transform_data.emplace_back(l_model);
+    
+        ComponentManager() {
+    
+            //instance me hume instance count sppecify karna hoga
+            next_MERGED_MDI_CMD = { 0,0,0,0,0 };
+    
+            s_library = ShapeLibrary();
         }
-
-        // Update offsets for next entry
-        next_MERGED_MDI_CMD.firstIndex += num_inds;
-        next_MERGED_MDI_CMD.baseVertex += num_verts;
-        next_MERGED_MDI_CMD.baseInstance += num_inst;
-
-    }
-};
+        void DEBUG_printCommand(const DrawElementsIndirectCommand cmd) {
+            std::cout << "Count: " << cmd.count
+                << ", Instances: " << cmd.instanceCount
+                << ", First Index: " << cmd.firstIndex
+                << ", Base Vertex: " << cmd.baseVertex
+                << ", Base Instance: " << cmd.baseInstance << std::endl;
+        }
+    
+        void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1, const glm::mat4&    l_model = glm::mat4(1.0)) {
+    
+            auto Storedsh = s_library.getShapeData(shapeName);
+            if (Storedsh == nullptr)std::cout << "Shape pointer not fetched\n";
+            size_t num_inds = Storedsh->indices.size();
+            size_t num_verts = Storedsh->vertices.size();
+    
+            // Compute offsets BEFORE updating the map
+            DrawElementsIndirectCommand currentCmd = {
+                num_inds, num_inst,
+                next_MERGED_MDI_CMD.firstIndex,    // Use existing offset
+                next_MERGED_MDI_CMD.baseVertex,
+                next_MERGED_MDI_CMD.baseInstance
+            };
+            //DEBUG_printCommand(currentCmd);
+    
+            STORAGE.indirect_commands_data.emplace_back(currentCmd);
+    
+            STORAGE.Shape_data.push_back(Storedsh);
+            for (size_t i = 0; i < num_inst; i++)
+            {
+                STORAGE.transform_data.emplace_back(l_model);
+            }
+    
+            // Update offsets for next entry
+            next_MERGED_MDI_CMD.firstIndex += num_inds;
+            next_MERGED_MDI_CMD.baseVertex += num_verts;
+            next_MERGED_MDI_CMD.baseInstance += num_inst;
+    
+        }
+    };
 }

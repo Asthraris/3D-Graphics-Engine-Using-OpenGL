@@ -43,16 +43,16 @@ public:
 
         cube->vertices = {
             // Front face
-            {{-half, -half,  half}, {1, 0, 0}, {0, 0, 1}, {0, 0}},
-            {{ half, -half,  half}, {0, 1, 0}, {0, 0, 1}, {1, 0}},
-            {{ half,  half,  half}, {0, 0, 1}, {0, 0, 1}, {1, 1}},
-            {{-half,  half,  half}, {1, 1, 0}, {0, 0, 1}, {0, 1}},
+            {{-half, -half,  half}, {1, 1, 1}, {0, 0, 1}, {0, 0}},
+            {{ half, -half,  half}, {1, 1, 1}, {0, 0, 1}, {1, 0}},
+            {{ half,  half,  half}, {1, 1, 1}, {0, 0, 1}, {1, 1}},
+            {{-half,  half,  half}, {1, 1, 1}, {0, 0, 1}, {0, 1}},
 
             // Back face
-            {{-half, -half, -half}, {1, 0, 1}, {0, 0, -1}, {0, 0}},
-            {{ half, -half, -half}, {0, 1, 1}, {0, 0, -1}, {1, 0}},
+            {{-half, -half, -half}, {1, 1, 1}, {0, 0, -1}, {0, 0}},
+            {{ half, -half, -half}, {1, 1, 1}, {0, 0, -1}, {1, 0}},
             {{ half,  half, -half}, {1, 1, 1}, {0, 0, -1}, {1, 1}},
-            {{-half,  half, -half}, {0.5, 0.5, 0.5}, {0, 0, -1}, {0, 1}}
+            {{-half,  half, -half}, {1, 1, 1}, {0, 0, -1}, {0, 1}}
         };
 
         cube->indices = {
@@ -73,10 +73,10 @@ public:
         float half = size / 2.0f;
 
         plane->vertices = {
-            {{-half, 0.0f, -half}, {0.7f, 0.7f, 0.7f}, {0, 1, 0}, {0, 0}},
-            {{ half, 0.0f, -half}, {0.7f, 0.7f, 0.7f}, {0, 1, 0}, {1, 0}},
-            {{ half, 0.0f,  half}, {0.7f, 0.7f, 0.7f}, {0, 1, 0}, {1, 1}},
-            {{-half, 0.0f,  half}, {0.7f, 0.7f, 0.7f}, {0, 1, 0}, {0, 1}}
+            {{-half, 0.0f, -half}, {1, 1, 1}, {0, 1, 0}, {0, 0}},
+            {{ half, 0.0f, -half}, {1, 1, 1}, {0, 1, 0}, {1, 0}},
+            {{ half, 0.0f,  half}, {1, 1, 1}, {0, 1, 0}, {1, 1}},
+            {{-half, 0.0f,  half}, {1, 1, 1}, {0, 1, 0}, {0, 1}}
         };
 
         plane->indices = { 0, 1, 2, 2, 3, 0 };
@@ -92,11 +92,11 @@ public:
         float half = size / 2.0f;
 
         pyramid->vertices = {
-            {{0.0f, size, 0.0f}, {1, 0, 0}, {0, 1, 0}, {0.5f, 1.0f}},    // Tip
-            {{-half, 0.0f, -half}, {0, 1, 0}, {0, -1, 0}, {0.0f, 0.0f}},  // Base 1
-            {{ half, 0.0f, -half}, {0, 0, 1}, {0, -1, 0}, {1.0f, 0.0f}},  // Base 2
-            {{ half, 0.0f,  half}, {1, 1, 0}, {0, -1, 0}, {1.0f, 1.0f}},  // Base 3
-            {{-half, 0.0f,  half}, {1, 0, 1}, {0, -1, 0}, {0.0f, 1.0f}}   // Base 4
+            {{0.0f, size, 0.0f}, {1, 1, 1}, {0, 1, 0}, {0.5f, 1.0f}},    // Tip
+            {{-half, 0.0f, -half}, {1, 1, 1}, {0, -1, 0}, {0.0f, 0.0f}},  // Base 1
+            {{ half, 0.0f, -half}, {1, 1, 1}, {0, -1, 0}, {1.0f, 0.0f}},  // Base 2
+            {{ half, 0.0f,  half}, {1, 1, 1}, {0, -1, 0}, {1.0f, 1.0f}},  // Base 3
+            {{-half, 0.0f,  half}, {1, 1, 1}, {0, -1, 0}, {0.0f, 1.0f}}   // Base 4
         };
 
         pyramid->indices = {
@@ -124,7 +124,7 @@ public:
                 float z = r * sin(lon);
 
                 glm::vec3 normal = glm::normalize(glm::vec3(x, y, z));
-                sphere->vertices.emplace_back(glm::vec3(x, y, z), normal, normal, glm::vec2((float)j / sectors, (float)i / stacks));
+                sphere->vertices.emplace_back(glm::vec3(x, y, z), glm::vec3(1.0f), normal, glm::vec2((float)j / sectors, (float)i / stacks));
 
                 if (i < stacks && j < sectors) {
                     int nextRow = (i + 1) * (sectors + 1);
@@ -156,8 +156,8 @@ public:
             float z = radius * sin(angle);
 
             // Top and bottom circle vertices
-            cylinder->vertices.emplace_back(glm::vec3(x, halfHeight, z), glm::vec3(1, 0, 0), glm::vec3(x, 0, z), glm::vec2(i / (float)segments, 1.0f));
-            cylinder->vertices.emplace_back(glm::vec3(x, -halfHeight, z), glm::vec3(0, 0, 1), glm::vec3(x, 0, z), glm::vec2(i / (float)segments, 0.0f));
+            cylinder->vertices.emplace_back(glm::vec3(x, halfHeight, z), glm::vec3(1.0f), glm::vec3(x, 0, z), glm::vec2(i / (float)segments, 1.0f));
+            cylinder->vertices.emplace_back(glm::vec3(x, -halfHeight, z), glm::vec3(1.0f), glm::vec3(x, 0, z), glm::vec2(i / (float)segments, 0.0f));
         }
 
         // Generate indices for sides

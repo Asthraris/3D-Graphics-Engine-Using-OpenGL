@@ -14,7 +14,7 @@ enum LEVEL {
 };
 //edit window me fog ki jarurat nhi 
 struct envConfigUniform {
-	float ambient = 0.0;               // 4 bytes
+	float ambient = 0.5f;               // 4 bytes
 	bool light_enable =true;            // 4 bytes (use int instead of bool)
 	alignas(16) glm::vec3 fog_color = glm::vec3(1.0);
 
@@ -31,7 +31,7 @@ private:
 	unsigned int configUBO;
 public:
 	envConfigUniform env;
-	float background[3] = {0.0,0.0,0.0};
+	float background[3] = {0.05,0.05,0.05};
 	int render_distance;
 	int level_of_detail;
 	float Gravity = 10.0;

@@ -25,7 +25,7 @@ namespace eng {
 // ye enity create karega and their components ko bhi and strore karega in Comonents manger me 
 class EntitiesIDGenerator {
 private:
-    uint32_t id_counter = 1;          // ID counter
+    uint32_t id_counter = 0;          // ID counter
     
 public:
     uint32_t create_id() {
