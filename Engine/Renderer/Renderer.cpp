@@ -80,7 +80,7 @@ void rend::Renderer::IMGUI_RENDER(int fps)
 	ImGui::Checkbox("ENABLE LIGHTS", &a_settings.env.light_enable);
 	ImGui::SliderFloat("Ambient Light", &a_settings.env.ambient, 0.0f, 1.0f);
 	
-
+	a_scene->IMGUI_SCENE_MANAGER();
 
 
 
@@ -144,7 +144,7 @@ rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move
 
 }
 
-void rend::Renderer::Initialize(const std::shared_ptr<eng::ComponentManager>& Component_UNIT)
+void rend::Renderer::UpdateBuffers(const std::shared_ptr<eng::ComponentManager>& Component_UNIT)
 {
 	//baadme isse public private dekhna abhi public maanke chal
 	a_component_UNIT = Component_UNIT;
@@ -276,10 +276,10 @@ void rend::Renderer::Run()
 
 	a_scene->createEntity(STATIC,"PLANE");
 	a_scene->createEntity(STATIC, "CUBE", 0);
-	a_scene->createEntity(STATIC, "SPHERE", 1);
+	a_scene->createEntity(STATIC, "SPHERE", 0);
 
 
-	Initialize(a_scene->getComponent2GPU());
+	UpdateBuffers(a_scene->getComponent2GPU());
 	while (!glfwWindowShouldClose(a_win->ptr)) {
 		deltaTime = Timer();
 		a_shader->Activate();

@@ -57,7 +57,7 @@ namespace rend{
 	public:
 		Renderer(LEVEL, std::unique_ptr <WINDOW>);
 		~Renderer();
-		void Initialize(const std::shared_ptr<eng::ComponentManager>& Component_UNIT);
+		void UpdateBuffers(const std::shared_ptr<eng::ComponentManager>& Component_UNIT);
 		void Run();
 		void finalMDIRender();
 	};

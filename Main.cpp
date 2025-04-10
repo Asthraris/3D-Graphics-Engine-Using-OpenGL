@@ -51,3 +51,5 @@ int main() {
 
 //v2
 /* ABHI ke liye me Shape data ko bhi include kar raha hu but baadme me shared ptr use karna chata hu to store similar shape point in one data Shape agar kuch naya shape hoga then i would provide an otion ko create an new Shape*/
+
+//AGAR dynamically add karna hai toh mujhe rendererka initialize ko bhi baar baar call karna hoga with better update in buffer isliye abhi me sirf inatnces ko update karnunga

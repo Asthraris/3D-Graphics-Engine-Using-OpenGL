@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <../imgui/imgui.h>
 
 
 #include "Entities.hpp"
@@ -35,6 +36,8 @@ namespace eng{
         void setPropsforDynamic() {
 
         }
+
+        
 
     public:
         SceneManager()
@@ -76,6 +79,35 @@ namespace eng{
 
         }
 
+
+        void drawNode(scene_node* node , uint32_t& selected_id) {
+            if (!node) return;
+
+            std::string label = "Entity " + std::to_string(node->entity.id);
+            ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanAvailWidth;
+            if (node->entity.id == selected_id)
+                flags |= ImGuiTreeNodeFlags_Selected;
+            ImGui::SetNextItemOpen(true, ImGuiCond_Always);  // Always expanded
+            if (ImGui::TreeNodeEx((void*)(intptr_t)node->entity.id, flags, "%s", label.c_str())) {
+                if (ImGui::IsItemClicked())
+                    selected_id = node->entity.id;
+
+                for (auto* child : node->Childrens) {
+                    drawNode(child, selected_id);
+                }
+                ImGui::TreePop();
+            }
+        }
+
+        void IMGUI_SCENE_MANAGER() {
+            static uint32_t curr_ent = 0;
+            ImGui::BeginChild("ComponentBox", ImVec2(0, 150), true);
+            ImGui::Text("SCENE MANAGER");
+            drawNode(e_Root,curr_ent);
+            ImGui::EndChild();
+
+
+        }
         //Later JOB
         void Update_Scene(float deltaTime) {
 
