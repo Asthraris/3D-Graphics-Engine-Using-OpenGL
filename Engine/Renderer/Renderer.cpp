@@ -128,6 +128,8 @@ rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move
 
 	glViewport(0, 0, a_win->width, a_win->height);
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_CULL_FACE);
+
 
 
 	IMGUI_INIT(a_win->ptr);
@@ -190,6 +192,9 @@ void rend::Renderer::UpdateBuffers(const std::shared_ptr<eng::ComponentManager>&
 	//DEBUG
 	if (vertices.empty())std::cout << "fuck verts\n";
 	if (indices.empty())std::cout << "fuck inds\n";
+	//DEBUG
+	std::cout << "RENDERER[DEBUG]-num_verts: "<<TOTAL_VERTEX<<"\n";
+	std::cout << "RENDERER[DEBUG]-num_inds: " << TOTAL_INDEX << "\n";
 
 
 	//binding the vAO before creation so i dont need to bind buffer again
@@ -242,6 +247,7 @@ void rend::Renderer::UpdateBuffers(const std::shared_ptr<eng::ComponentManager>&
 
 
 	NUM_MERGED_CMD = a_component_UNIT->STORAGE.indirect_commands_data.size();
+	std::cout << "RENDERER[DEBUG]-num_cmd : " << NUM_MERGED_CMD << "\n";
 	glGenBuffers(1, &MERGED_MDI_COMMAND);
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
 	glBufferData(GL_DRAW_INDIRECT_BUFFER,
@@ -274,9 +280,8 @@ void rend::Renderer::Run()
 	glfwSetKeyCallback(a_win->ptr, keyCallback);
 	glfwSetScrollCallback(a_win->ptr, rend::Renderer::scroll_callback);
 
-	a_scene->createEntity(STATIC,"PLANE");
-	a_scene->createEntity(STATIC, "CUBE", 0);
-	a_scene->createEntity(STATIC, "SPHERE", 0);
+	a_scene->loadModel("SWORD", "Resources/sword/scene.gltf");
+	a_scene->createEntity(STATIC,"SWORD");
 
 
 	UpdateBuffers(a_scene->getComponent2GPU());

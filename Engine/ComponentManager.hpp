@@ -7,7 +7,7 @@
 #include <iostream>
 
 //user
-#include "Transformation.h"
+#include "Transformation.hpp"
 #include "Entities.hpp"
 #include "Shape_Library.hpp"
 #include "Shape.hpp"
@@ -25,7 +25,7 @@ struct DrawElementsIndirectCommand {
 
 struct MERGED_entity_renderer_data {
     std::vector<eng::Transformation> transform_data;
-    std::vector<glm::mat4> matrix_data;
+    std::vector<glm::mat4> matrix_data ;
     std::vector< std::shared_ptr<Shape>> Shape_data;
     std::vector< DrawElementsIndirectCommand> indirect_commands_data;
 };
@@ -43,11 +43,11 @@ namespace eng {
 
     class ComponentManager {
     private:
-        //HOLDS the every Shape recored
-        ShapeLibrary s_library;
     
     public:
     
+        //HOLDS the every Shape recored
+        ShapeLibrary s_library;
         //holds next base loaction to directly assign them with comm_map of 
         DrawElementsIndirectCommand next_MERGED_MDI_CMD;
     
@@ -85,9 +85,9 @@ namespace eng {
                 << ", Base Instance: " << cmd.baseInstance << std::endl;
         }
     
-        void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1) {
+        void markEntry(ENTITY l_en, std::string shapeName_or_path, size_t num_inst = 1) {
     
-            auto Storedsh = s_library.getShapeData(shapeName);
+            auto Storedsh = s_library.getShapeData(shapeName_or_path);
             if (Storedsh == nullptr)std::cout << "Shape pointer not fetched from loaded shapes\n";
             size_t num_inds = Storedsh->indices.size();
             size_t num_verts = Storedsh->vertices.size();
@@ -106,7 +106,7 @@ namespace eng {
             STORAGE.Shape_data.push_back(Storedsh);
             for (size_t i = 0; i < num_inst; i++)
             {
-                STORAGE.transform_data.emplace_back(Transformation());
+                STORAGE.transform_data.emplace_back(Transformation(s_library.getmatrixLoaded(shapeName_or_path)));
                 STORAGE.matrix_data.emplace_back(STORAGE.transform_data.back().getModelMat());
                 STORAGE.transform_data.back().mat_ptr = &STORAGE.matrix_data.back();
             }

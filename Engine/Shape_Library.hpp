@@ -6,6 +6,8 @@
 
 
 #include "Shape.hpp"
+#include "LoadModels.hpp"
+
 
 constexpr double PI = 3.14159265358979323846;
 constexpr double TWO_PI = 2.0 * PI;
@@ -15,6 +17,10 @@ namespace eng {
 
 class ShapeLibrary {
 	std::unordered_map<std::string, std::shared_ptr<Shape>> StoredShapes;
+    std::unordered_map<std::string, glm::mat4> StoredMatrix;
+
+    GLTFLoader LOADER;
+
 public:
 	ShapeLibrary() {
 		//add default shapes
@@ -24,10 +30,41 @@ public:
         createSphere();
         createCylinder();
 	}
-	void addShapeData(const std::string& name, std::shared_ptr<Shape> shape) {
-		StoredShapes[name] = shape;
-	}
+    //dynamically loads model into shape library
 
+    void addShapeData(const std::string& name, std::shared_ptr<Shape>shape) {
+        StoredShapes[name] = shape;
+    }
+    void addShapeData(const std::string& name, const std::string& path ) {
+        std::vector<MeshData> rawData;
+        bool success = LOADER.loadGLTFobj(path, rawData);
+        if (!success) {
+            std::cerr << "Failed to load model at: " << path << std::endl;
+            return;
+        }
+
+        if (rawData.empty()) {
+            std::cerr << "No mesh data found in model: " << path << std::endl;
+            return;
+        }
+
+        // Create shape and store mesh data
+        std::shared_ptr<Shape> shapedata = std::make_shared<Shape>();
+        shapedata->setMeshData(rawData[0].Positions, rawData[0].Normals, rawData[0].Indices);
+
+        // Store shape and its transform matrix
+        StoredShapes[name] = shapedata;
+        StoredMatrix[name] = rawData[0].Transform_mat;
+    }
+
+    
+    glm::mat4 getmatrixLoaded(const std::string& name) {
+        auto it = StoredMatrix.find(name);
+        if (it != StoredMatrix.end()) {
+            return it->second;
+        }
+        return glm::mat4(1.0);
+    }
 	std::shared_ptr<Shape> getShapeData(const std::string& name) {
         auto it = StoredShapes.find(name);
         if (it != StoredShapes.end()) {

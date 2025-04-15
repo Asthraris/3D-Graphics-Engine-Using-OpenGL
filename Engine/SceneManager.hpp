@@ -59,14 +59,14 @@ namespace eng{
             return nullptr;
         }
         // Create entity with raw pointers for performance
-        void createEntity(entities_type l_type, std::string shapeName, uint32_t parent_id = -1, size_t num_instnace = 1 )
+        void createEntity(entities_type l_type, std::string shapeName_or_path, uint32_t parent_id = -1, size_t num_instnace = 1 )
         {
             // Allocate scene_node on the stack for better performance
             ENTITY temp = ENTITY(id_generator.create_id(), l_type);
             //std::cout << temp.id << "\n";
             scene_node* parent_scene = findNodeByID(e_Root, parent_id);
             // Mark entry with temp entity
-            Component_UNIT->markEntry(temp, shapeName, num_instnace);
+            Component_UNIT->markEntry(temp, shapeName_or_path, num_instnace);
 
             scene_node* new_node = new scene_node(temp);
 
@@ -79,7 +79,9 @@ namespace eng{
 
         }
 
-
+        void loadModel(const std::string& name,const std::string& path) {
+            Component_UNIT->s_library.addShapeData(name, path);
+        }
         void drawNode(scene_node* node , uint32_t& selected_id) {
             if (!node) return;
 

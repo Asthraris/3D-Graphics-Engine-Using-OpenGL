@@ -8,7 +8,7 @@
 
 struct VERTEX {
 	glm::vec3 POS;
-	glm::vec3 COLOR = glm::vec3(0.1, 0.5, 0.1);
+	glm::vec3 COLOR = glm::vec3(0.8, 0.8, 0.8);
 	glm::vec3 NORMAL = glm::vec3(0.0);
 	glm::vec2 TEX_COORDS = glm::vec2(0.0);  // Ensuring proper initialization
 
@@ -35,6 +35,25 @@ public:
 		indices = storedData.indices;   // Direct copy
 
 	}
+	void setMeshData(const std::vector<glm::vec3>& positions,
+		const std::vector<glm::vec3>& normals,
+		const std::vector<unsigned short>& indicesInput)
+	{
+		vertices.clear();
+		indices = indicesInput;
+
+		size_t count = positions.size();
+		vertices.reserve(count);
+
+		for (size_t i = 0; i < count; ++i) {
+			glm::vec3 pos = positions[i];
+			glm::vec3 normal = (i < normals.size()) ? normals[i] : glm::vec3(0.0f);
+			glm::vec2 tex = glm::vec2(0.0f); // Currently not loaded
+
+			vertices.emplace_back(pos,glm::vec3(1.0f), normal, tex);
+		}
+	}
+
 };
 
 
