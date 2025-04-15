@@ -80,7 +80,7 @@ void rend::Renderer::IMGUI_RENDER(int fps)
 	ImGui::Checkbox("ENABLE LIGHTS", &a_settings.env.light_enable);
 	ImGui::SliderFloat("Ambient Light", &a_settings.env.ambient, 0.0f, 1.0f);
 	
-	a_scene->IMGUI_SCENE_MANAGER();
+	a_scene->IMGUI_SCENE_PROPS();
 
 
 
@@ -231,8 +231,8 @@ void rend::Renderer::UpdateBuffers(const std::shared_ptr<eng::ComponentManager>&
 	*/
 	glCreateBuffers(1, &MERGED_MODEL_SSBO);
 	glNamedBufferStorage(MERGED_MODEL_SSBO,
-		a_component_UNIT->STORAGE.transform_data.size() * sizeof(glm::mat4),
-		a_component_UNIT->STORAGE.transform_data.data(),
+		a_component_UNIT->STORAGE.matrix_data.size() * sizeof(glm::mat4),
+		a_component_UNIT->STORAGE.matrix_data.data(),
 		GL_DYNAMIC_STORAGE_BIT);
 	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, BINDIND_INDX_INST, MERGED_MODEL_SSBO);
 	//link Commandbuffer to VAO

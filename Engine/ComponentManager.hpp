@@ -7,6 +7,7 @@
 #include <iostream>
 
 //user
+#include "Transformation.h"
 #include "Entities.hpp"
 #include "Shape_Library.hpp"
 #include "Shape.hpp"
@@ -23,7 +24,8 @@ struct DrawElementsIndirectCommand {
 };
 
 struct MERGED_entity_renderer_data {
-    std::vector<glm::mat4> transform_data;
+    std::vector<eng::Transformation> transform_data;
+    std::vector<glm::mat4> matrix_data;
     std::vector< std::shared_ptr<Shape>> Shape_data;
     std::vector< DrawElementsIndirectCommand> indirect_commands_data;
 };
@@ -55,7 +57,18 @@ namespace eng {
 
         //std::unordered_map < props_Locator, DYNAMIC_entity_props> PROPS_map;
 
+        void IMGUI_COMP_PROPS(uint32_t curr_id) {
+            ImGui::BeginChild("TRANSFORM PROS", ImVec2(0, 150), true);
+            //yaha pat temp instance bananya sayad se sahi hoga
+            ImGui::Text("TRANSFORM MANAGER");
+            ImGui::DragFloat3("Position: ", &STORAGE.transform_data[curr_id].Position.x);
+            ImGui::DragFloat3("Scale: ", &STORAGE.transform_data[curr_id].Scale.x);
+            ImGui::SliderFloat("Degrees rotation: ", &STORAGE.transform_data[curr_id].Rotation_degree, 0, 360.0f);
+            ImGui::DragFloat3("Rotational_axis: ", &STORAGE.transform_data[curr_id].Rotational_axis.x);
 
+
+            ImGui::EndChild();
+        }
     
         ComponentManager() {
     
@@ -72,10 +85,10 @@ namespace eng {
                 << ", Base Instance: " << cmd.baseInstance << std::endl;
         }
     
-        void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1, const glm::mat4&    l_model = glm::mat4(1.0)) {
+        void markEntry(ENTITY l_en, std::string shapeName, size_t num_inst = 1) {
     
             auto Storedsh = s_library.getShapeData(shapeName);
-            if (Storedsh == nullptr)std::cout << "Shape pointer not fetched\n";
+            if (Storedsh == nullptr)std::cout << "Shape pointer not fetched from loaded shapes\n";
             size_t num_inds = Storedsh->indices.size();
             size_t num_verts = Storedsh->vertices.size();
     
@@ -93,7 +106,9 @@ namespace eng {
             STORAGE.Shape_data.push_back(Storedsh);
             for (size_t i = 0; i < num_inst; i++)
             {
-                STORAGE.transform_data.emplace_back(l_model);
+                STORAGE.transform_data.emplace_back(Transformation());
+                STORAGE.matrix_data.emplace_back(STORAGE.transform_data.back().getModelMat());
+                STORAGE.transform_data.back().mat_ptr = &STORAGE.matrix_data.back();
             }
     
             // Update offsets for next entry
