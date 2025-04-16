@@ -16006,9 +16006,7 @@ void ImGui::ShowMetricsWindow(bool* p_open)
         }
     }
 
-#ifdef IMGUI_HAS_DOCK
-   
-#endif // #ifdef IMGUI_HAS_DOCK
+ // #ifdef IMGUI_HAS_DOCK
 
     End();
 }
