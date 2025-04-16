@@ -304,6 +304,7 @@ void rend::Renderer::Run()
 		deltaTime = Timer();
 		a_shader->Activate();
 		//std::cout << 1.0/deltaTime << "\n";
+
 		a_settings.check4Change();
 		glClearColor(a_settings.background[0], a_settings.background[1], a_settings.background[2], 1.0);
 		

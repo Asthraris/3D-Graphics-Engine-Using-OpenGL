@@ -75,10 +75,10 @@
 ## 📸 Screenshots
 
 ### 🧱 Scene Hierarchy with Live Transform Editing
-![Scene Editor](Resources/ss/scene_editor.png)
+![Scene Editor](Resources/demo/system.png)
 
 ### 🌀 Arcball Camera Control in Action
-![Arcball Demo](Resources/ss/arcball_demo.gif)
+![Arcball Demo](Resources/demo/free.gif)
 
 
 ## **Future goals include**
