@@ -1,4 +1,5 @@
-# ⚙️ Ares Engine — A Modular Game Engine Powered by Modern OpenGL 4.6
+# ⚙️ Asthrarisine Engine — A Modular Game Engine Powered by Modern OpenGL 4.6 
+#    created by Aman Gupta
 
 > A cross-platform, performance-first game engine built entirely with modern OpenGL 4.6, featuring an ECS-based architecture, GPU-driven workflows, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
 
