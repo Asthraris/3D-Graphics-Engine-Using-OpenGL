@@ -17,8 +17,20 @@ struct MeshData {
     glm::mat4 Transform_mat;
 };
 
+
+
+
 class GLTFLoader {
 public:
+void PrintMat4(const glm::mat4& mat) {
+    for (int row = 0; row < 4; ++row) {
+        std::cout << "| ";
+        for (int col = 0; col < 4; ++col) {
+            std::cout << mat[col][row] << " ";
+        }
+        std::cout << "|\n";
+    }
+}
 
     void extractMeshData(const tinygltf::Model& model, const tinygltf::Node& node, const glm::mat4& parentTrans, std::vector<MeshData>& outmeshes) {
         std::cout << "[Debug] Extracting mesh data from node...\n";

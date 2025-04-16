@@ -54,6 +54,8 @@ namespace rend{
 
 		//-------------
 		static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+		void UpdateModelmatrixInGPU(int32_t changed_matrix_id);
+
 	public:
 		Renderer(LEVEL, std::unique_ptr <WINDOW>);
 		~Renderer();

@@ -57,7 +57,8 @@ namespace eng {
 
         //std::unordered_map < props_Locator, DYNAMIC_entity_props> PROPS_map;
 
-        void IMGUI_COMP_PROPS(uint32_t curr_id) {
+        void IMGUI_COMP_PROPS(int32_t curr_id) {
+            if (curr_id == -1)return;
             ImGui::BeginChild("TRANSFORM PROS", ImVec2(0, 150), true);
             //yaha pat temp instance bananya sayad se sahi hoga
             ImGui::Text("TRANSFORM MANAGER");

@@ -37,7 +37,7 @@ public:
     }
 
     void reset() {
-        id_counter = 1;
+        id_counter = 0;
     }
 };
 

@@ -80,8 +80,8 @@ void rend::Renderer::IMGUI_RENDER(int fps)
 	ImGui::Checkbox("ENABLE LIGHTS", &a_settings.env.light_enable);
 	ImGui::SliderFloat("Ambient Light", &a_settings.env.ambient, 0.0f, 1.0f);
 	
-	a_scene->IMGUI_SCENE_PROPS();
-
+	int32_t selected_entity = a_scene->IMGUI_SCENE_PROPS();
+	
 
 
 	ImGui::End();
@@ -91,6 +91,8 @@ void rend::Renderer::IMGUI_RENDER(int fps)
 	// Render ImGui
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+	UpdateModelmatrixInGPU(selected_entity);
 }
 
 void rend::Renderer::IMGUI_DESTROY(){
@@ -107,6 +109,17 @@ void rend::Renderer::scroll_callback(GLFWwindow* window, double xoffset, double 
 	if (renderer && renderer->a_editCam) {
 		renderer->a_editCam->setScrollDelta(static_cast<float>(yoffset));
 	}
+}
+
+void rend::Renderer::UpdateModelmatrixInGPU(int32_t changed_matrix_id)
+{
+	if (changed_matrix_id ==-1 ) return; // safety
+
+	// Calculate offset
+	GLsizeiptr offset = static_cast<GLsizeiptr>(changed_matrix_id) * sizeof(glm::mat4);
+	glm::mat4 selected_matrix = a_component_UNIT->STORAGE.transform_data[changed_matrix_id].getModelMat();
+	// Update specific matrix at index
+	glNamedBufferSubData(MERGED_MODEL_SSBO, offset, sizeof(glm::mat4), &selected_matrix);
 }
 
 rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move(ptr)) {
@@ -282,6 +295,7 @@ void rend::Renderer::Run()
 
 	a_scene->loadModel("SWORD", "Resources/sword/scene.gltf");
 	a_scene->createEntity(STATIC,"SWORD");
+	a_scene->createEntity(STATIC, "CUBE", 0);
 
 
 	UpdateBuffers(a_scene->getComponent2GPU());

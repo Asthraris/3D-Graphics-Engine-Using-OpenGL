@@ -54,6 +54,7 @@ public:
 
         // Store shape and its transform matrix
         StoredShapes[name] = shapedata;
+
         StoredMatrix[name] = rawData[0].Transform_mat;
     }
 
