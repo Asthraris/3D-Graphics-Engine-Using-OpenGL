@@ -22,15 +22,19 @@ struct MeshData {
 
 class GLTFLoader {
 public:
-void PrintMat4(const glm::mat4& mat) {
-    for (int row = 0; row < 4; ++row) {
-        std::cout << "| ";
-        for (int col = 0; col < 4; ++col) {
-            std::cout << mat[col][row] << " ";
+    void PrintMat4(const glm::mat4& mat) {
+        for (int row = 0; row < 4; ++row) {
+            std::cout << "| ";
+            for (int col = 0; col < 4; ++col) {
+                std::cout << mat[col][row] << " ";
+            }
+            std::cout << "|\n";
         }
-        std::cout << "|\n";
     }
-}
+    bool ends_with(const std::string& str, const std::string& suffix) {
+        return str.size() >= suffix.size() &&
+            str.compare(str.size() - suffix.size(), suffix.size(), suffix) == 0;
+    }
 
     void extractMeshData(const tinygltf::Model& model, const tinygltf::Node& node, const glm::mat4& parentTrans, std::vector<MeshData>& outmeshes) {
         std::cout << "[Debug] Extracting mesh data from node...\n";
@@ -92,7 +96,6 @@ void PrintMat4(const glm::mat4& mat) {
                     const auto& idxView = model.bufferViews[idxAccessor.bufferView];
                     const auto& idxBuffer = model.buffers[idxView.buffer];
 
-                    std::cout << "[Debug] Index count: " << idxAccessor.count << "\n";
 
                     switch (idxAccessor.componentType) {
                     case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE: {
@@ -121,12 +124,6 @@ void PrintMat4(const glm::mat4& mat) {
                 else {
                     std::cout << "[Warning] No index buffer found.\n";
                 }
-
-                std::cout << "[Debug] MeshData added: "
-                    << "Verts=" << data.Positions.size()
-                    << ", Normals=" << data.Normals.size()
-                    << ", Indices=" << data.Indices.size() << "\n";
-
                 outmeshes.push_back(std::move(data));
             }
         }
@@ -143,17 +140,21 @@ void PrintMat4(const glm::mat4& mat) {
         tinygltf::TinyGLTF loader;
         std::string err, warn;
 
-        std::cout << "[Debug] Loading GLTF file: " << path << "\n";
-        bool ret = loader.LoadASCIIFromFile(&model, &err, &warn, path);
+        bool ret=false;
+        if (ends_with(path, ".glb")) {
+            std::cout << "[Debug] Loading GLB file: " << path << "\n";
+            ret =loader.LoadBinaryFromFile(&model, &err, &warn, path);
+        }
+        else {
+            std::cout << "[Debug] Loading GLTF file: " << path << "\n";
+            ret =loader.LoadASCIIFromFile(&model, &err, &warn, path);
+        }
         if (!warn.empty()) std::cout << "[GLTF-WARN] " << warn << "\n";
         if (!err.empty()) std::cout << "[GLTF-ERROR] " << err << "\n";
         if (!ret) {
             std::cerr << "[Fatal] Failed to load GLTF.\n";
             return false;
         }
-
-        std::cout << "[Debug] Scene count: " << model.scenes.size() << "\n";
-        std::cout << "[Debug] Default scene index: " << model.defaultScene << "\n";
 
         // Extract meshes from the default scene
         for (const auto& nodeIdx : model.scenes[model.defaultScene].nodes) {
