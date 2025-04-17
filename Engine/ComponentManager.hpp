@@ -66,6 +66,7 @@ namespace eng {
             ImGui::DragFloat3("Scale: ", &STORAGE.transform_data[curr_id].Scale.x);
             ImGui::SliderFloat("Degrees rotation: ", &STORAGE.transform_data[curr_id].Rotation_degree, 0, 360.0f);
             ImGui::DragFloat3("Rotational_axis: ", &STORAGE.transform_data[curr_id].Rotational_axis.x);
+            
 
 
             ImGui::EndChild();
@@ -108,7 +109,10 @@ namespace eng {
             for (size_t i = 0; i < num_inst; i++)
             {
                 STORAGE.transform_data.emplace_back(Transformation(s_library.getmatrixLoaded(shapeName_or_path)));
-                STORAGE.matrix_data.emplace_back(STORAGE.transform_data.back().getModelMat());
+                
+                STORAGE.matrix_data.emplace_back(
+                    STORAGE.transform_data.back().getModelMat()
+                );
                 STORAGE.transform_data.back().mat_ptr = &STORAGE.matrix_data.back();
             }
     

@@ -24,7 +24,7 @@ private:
 	//filhaal me sab public kar raha hu baad me isko abstract karunga
 public:
 	std::vector<VERTEX> vertices;
-	std::vector<unsigned short> indices;
+	std::vector<unsigned int> indices;
 	Shape() {
 		
 	}
@@ -37,7 +37,7 @@ public:
 	}
 	void setMeshData(const std::vector<glm::vec3>& positions,
 		const std::vector<glm::vec3>& normals,
-		const std::vector<unsigned short>& indicesInput)
+		const std::vector<unsigned int>& indicesInput)
 	{
 		vertices.clear();
 		indices = indicesInput;

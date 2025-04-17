@@ -177,7 +177,7 @@ void rend::Renderer::UpdateBuffers(const std::shared_ptr<eng::ComponentManager>&
 		vertices.resize(TOTAL_VERTEX);
 	}
 
-	std::vector<unsigned short>indices(TOTAL_INDEX);
+	std::vector<unsigned int>indices(TOTAL_INDEX);
 	if (indices.size() < TOTAL_INDEX) {
 		indices.resize(TOTAL_INDEX);
 	}
@@ -191,7 +191,7 @@ void rend::Renderer::UpdateBuffers(const std::shared_ptr<eng::ComponentManager>&
 	for (auto& shape_shr : a_component_UNIT->STORAGE.Shape_data) {
 
 		vert_size_bytes = shape_shr->vertices.size() * sizeof(VERTEX);
-		inds_size_bytes = shape_shr->indices.size() * sizeof(unsigned short);
+		inds_size_bytes = shape_shr->indices.size() * sizeof(unsigned int);
 		//if memeory error use std::copy
 		memcpy(reinterpret_cast<char*>(vertices.data()) + offset_verts,
 			shape_shr->vertices.data(), vert_size_bytes);
@@ -239,7 +239,7 @@ void rend::Renderer::UpdateBuffers(const std::shared_ptr<eng::ComponentManager>&
 
 	//link Index buffer to VAO
 	glCreateBuffers(1, &IBO);
-	glNamedBufferData(IBO, TOTAL_INDEX * sizeof(unsigned short), indices.data(), GL_STATIC_DRAW);
+	glNamedBufferData(IBO, TOTAL_INDEX * sizeof(unsigned int), indices.data(), GL_STATIC_DRAW);
 	glVertexArrayElementBuffer(MERGED_VAO, IBO);
 	/*
 
@@ -353,7 +353,7 @@ void rend::Renderer::finalMDIRender()
 
 	glBindBuffer(GL_DRAW_INDIRECT_BUFFER, MERGED_MDI_COMMAND);
 
-	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, nullptr, NUM_MERGED_CMD, sizeof_mdi_commands);
+	glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_INT, nullptr, NUM_MERGED_CMD, sizeof_mdi_commands);
 }
 
 

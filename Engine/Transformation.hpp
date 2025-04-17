@@ -15,6 +15,7 @@ namespace eng{
 		float Rotation_degree;
 		glm::vec3 Rotational_axis;
 		glm::vec3 Scale;
+		
 
 		glm::mat4* mat_ptr;
 		Transformation():

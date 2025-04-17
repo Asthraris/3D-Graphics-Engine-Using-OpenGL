@@ -7,13 +7,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "GLTF/tiny_gltf.h"
+#include <GLTF/tiny_gltf.h>
 #include "Transformation.hpp"
 
 struct MeshData {
     std::vector<glm::vec3> Positions;
     std::vector<glm::vec3> Normals;
-    std::vector<unsigned short> Indices;
+    std::vector<unsigned int> Indices;
     glm::mat4 Transform_mat;
 };
 
@@ -71,7 +71,7 @@ public:
                 const auto& posView = model.bufferViews[posAccessor.bufferView];
                 const auto& posBuffer = model.buffers[posView.buffer];
 
-                std::cout << "[Debug] Position count: " << posAccessor.count << "\n";
+                
                 const float* positions = reinterpret_cast<const float*>(&posBuffer.data[posView.byteOffset + posAccessor.byteOffset]);
                 for (size_t i = 0; i < posAccessor.count; ++i)
                     data.Positions.emplace_back(positions[i * 3 + 0], positions[i * 3 + 1], positions[i * 3 + 2]);
@@ -99,27 +99,31 @@ public:
 
                     switch (idxAccessor.componentType) {
                     case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE: {
-                        const uint8_t* indices = reinterpret_cast<const uint8_t*>(&idxBuffer.data[idxView.byteOffset + idxAccessor.byteOffset]);
+                        const uint8_t* indices = reinterpret_cast<const uint8_t*>(
+                            &idxBuffer.data[idxView.byteOffset + idxAccessor.byteOffset]);
                         for (size_t i = 0; i < idxAccessor.count; ++i)
-                            data.Indices.push_back(static_cast<unsigned short>(indices[i]));
+                            data.Indices.push_back(static_cast<unsigned int>(indices[i]));
                         break;
                     }
                     case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT: {
-                        const uint16_t* indices = reinterpret_cast<const uint16_t*>(&idxBuffer.data[idxView.byteOffset + idxAccessor.byteOffset]);
+                        const uint16_t* indices = reinterpret_cast<const uint16_t*>(
+                            &idxBuffer.data[idxView.byteOffset + idxAccessor.byteOffset]);
                         for (size_t i = 0; i < idxAccessor.count; ++i)
-                            data.Indices.push_back(indices[i]);
+                            data.Indices.push_back(static_cast<unsigned int>(indices[i]));
                         break;
                     }
                     case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT: {
-                        const uint32_t* indices = reinterpret_cast<const uint32_t*>(&idxBuffer.data[idxView.byteOffset + idxAccessor.byteOffset]);
+                        const uint32_t* indices = reinterpret_cast<const uint32_t*>(
+                            &idxBuffer.data[idxView.byteOffset + idxAccessor.byteOffset]);
                         for (size_t i = 0; i < idxAccessor.count; ++i)
-                            data.Indices.push_back(static_cast<unsigned short>(indices[i])); // Truncation: This can lead to overflow if index > 65535
+                            data.Indices.push_back(static_cast<unsigned int>(indices[i]));
                         break;
                     }
                     default:
                         std::cerr << "[Error] Unsupported index component type: " << idxAccessor.componentType << "\n";
                         break;
                     }
+
                 }
                 else {
                     std::cout << "[Warning] No index buffer found.\n";
