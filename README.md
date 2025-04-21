@@ -1,7 +1,7 @@
-# ⚙️ Asthrarisine Engine — A Modular Game Engine Powered by Modern OpenGL 4.6 
+# ⚙️ Asthrarisine Engine — A Modular Graphics Engine Powered by Modern OpenGL 4.6 
 #    created by Aman Gupta
 
-> A cross-platform, performance-first game engine built entirely with modern OpenGL 4.6, featuring an ECS-based architecture, GPU-driven workflows, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
+> A cross-platform, performance-first graphics engine built entirely with modern OpenGL 4.6, featuring an ECS-based architecture, GPU-driven workflows, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
 
 ---
 
@@ -88,10 +88,5 @@
       -🧵 Multithreaded asset streaming
       -🎨 Material & shader editor
 ---
-
----
 Inspired by: TheCherno's Hazel Engine
-Let me know if you want:
-- Badges for CI, License, Platform, etc.
-- Sample GIFs for the `README.md`
-- Architecture diagrams in PNG/SVG
+
