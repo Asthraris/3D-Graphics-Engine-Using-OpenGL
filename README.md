@@ -1,7 +1,7 @@
 # ⚙️ Asthrarisine Engine — A High Performance Graphics Engine Powered by Modern OpenGL 4.6 
 #    Created by Aman Gupta
 
-> A cross-platform, performance-first graphics engine built entirely with modern OpenGL 4.6,featuring Advanced GPU Instancing by single draw call using 'glMultiDrawIndirectInstanced()' containing ECS-based architecture, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
+> A cross-platform, performance-first graphics engine built entirely with modern OpenGL 4.6 utilizing its Graphics Pipeline ,featuring Advanced GPU Instancing by single draw call using 'glMultiDrawIndirectInstanced()' containing ECS-based architecture, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
 
 ---
 
