@@ -1,6 +1,6 @@
 # ⚙️ Asthrarisine Engine — A High Performance Graphics Engine Powered by Modern OpenGL 4.6 
 #    Created by Aman Gupta
-
+![Arcball Demo](Resources/demo/free.gif)
 > A cross-platform, performance-first graphics engine built entirely with modern OpenGL 4.6 utilizing its Graphics Pipeline ,featuring Advanced GPU Instancing by single draw call using 'glMultiDrawIndirectInstanced()' containing ECS-based architecture, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
 
 ---
@@ -78,8 +78,7 @@
 ### 🧱 Scene Hierarchy with Live Transform Editing
 ![Scene Editor](Resources/demo/system.png)
 
-### 🌀 Arcball Camera Control in Action
-![Arcball Demo](Resources/demo/free.gif)
+
 
 
 ## **Future goals include**
