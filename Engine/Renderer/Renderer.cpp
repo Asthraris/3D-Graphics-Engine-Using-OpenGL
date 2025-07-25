@@ -295,10 +295,10 @@ void rend::Renderer::Run()
 
 	a_scene->loadModel("SWORD", "Resources/sword/scene.gltf");
 	a_scene->loadModel("CAR", "Resources/demo/gtr-car.glb");
+	a_scene->loadModel("CAR", "Resources/bunny/scene.gtf");
 
 	a_scene->createEntity(STATIC,"SWORD");
 	a_scene->createEntity(STATIC, "SPHERE", 0);
-	a_scene->createEntity(STATIC, "CAR", 1);
 
 
 	UpdateBuffers(a_scene->getComponent2GPU());
