@@ -1,4 +1,5 @@
-# ⚙️ Asthrarisine Engine — A High Performance Graphics Engine Powered by Modern OpenGL 4.6 
+<h3 align="center"> ⚙️ Asthrarisine Engine — A High Performance Graphics Engine Powered by Modern OpenGL 4.6 </h2>
+
 #    Created by Aman Gupta
 ![Arcball Demo](Resources/demo/free.gif)
 > A cross-platform, performance-first graphics engine built entirely with modern OpenGL 4.6 utilizing its Graphics Pipeline ,featuring Advanced GPU Instancing by single draw call using 'glMultiDrawIndirectInstanced()' containing ECS-based architecture, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
@@ -18,40 +19,32 @@
 
 ---
 
-## 🧠 Architecture Highlights
+##  Architecture Highlights
 
-### ✅ **Entity-Component-System (ECS)**
+###  **Entity-Component-System (ECS)**
 - Designed around **data-oriented programming** principles.
 - Entities are simple IDs.
 - Components are POD structures stored in flat hash maps.
 - Systems iterate efficiently over matching components.
 
----
-
-### 🧩 **Scene Hierarchy**
+###  **Scene Hierarchy**
 - Each entity can parent others, enabling full transform propagation.
 - Scene graph logic supports:
   - World/Local matrix decomposition
   - Real-time updates through ImGui
   - Instancing and prefab-like composition
 
----
-
-### 🧠 **Dynamic GPU Updates via ImGui**
+###  **Dynamic GPU Updates via ImGui**
 - Entity transforms are controlled through ImGui sliders in real-time.
 - Transform buffers are updated using persistent-mapped UBOs or SSBOs.
 - Enables **live editing** without recompiling shaders or re-uploading meshes.
 
----
-
-### 🕹️ **Arcball Camera**
+###  **Arcball Camera**
 - Mouse-controlled camera with orbit, pan, and zoom.
 - Implements quaternion-based arcball rotation.
 - Perfect for 3D editors, model viewers, and level design tools.
 
----
-
-### 🖼️ **Renderer Class**
+###  **Renderer Class**
 - Central abstraction layer for all OpenGL operations.
 - Manages:
   - Shader binding
@@ -62,7 +55,7 @@
 
 ---
 
-## 📦 Features at a Glance
+##  Features at a Glance
 
 - ⚡ **Modern OpenGL 4.6 Core** — DSA, persistent mapping, bindless-ready
 - 🧠 **ECS Scene Management** — scalable and decoupled
@@ -72,20 +65,6 @@
 - 🎮 **Renderer Abstraction** — clean interface for rendering logic and draw call submission
 - 🔁 **Multi-Draw Instancing** — significant draw call reduction for large scenes
 
----
-## 📸 Screenshots
 
-### 🧱 Scene Hierarchy with Live Transform Editing
-![Scene Editor](Resources/demo/system.png)
-
-
-
-
-## **Future goals include**
-      -🔬 Physics system (Bullet or custom)
-      -🧩 Scripting layer (Lua or WASM)
-      -🧵 Multithreaded asset streaming
-      -🎨 Material & shader editor
----
 Inspired by: TheCherno's Hazel Engine
 
