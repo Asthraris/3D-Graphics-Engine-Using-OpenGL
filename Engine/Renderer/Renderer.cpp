@@ -150,7 +150,7 @@ rend::Renderer::Renderer(LEVEL lvl,std::unique_ptr <WINDOW> ptr):a_win(std::move
 	a_settings = CONFIG(lvl);
 	a_aura = LightManager(3);
 
-	a_shader = new Shader("Engine/Renderer/src/shaders/basic.vert", "Engine/Renderer/src/shaders/basic.frag");
+	a_shader = new Shader("shaders/basic.vert", "shaders/basic.frag");
 	a_scene = new eng::SceneManager();
 	//45 deg is ideal/ perfect for ORbit or editor style camera
 	a_editCam = new eng::ArcBall(45.0f, 0.1f, 40.0f, (float(a_win->width) / (float)a_win->height));
@@ -293,11 +293,14 @@ void rend::Renderer::Run()
 	glfwSetKeyCallback(a_win->ptr, keyCallback);
 	glfwSetScrollCallback(a_win->ptr, rend::Renderer::scroll_callback);
 
-	a_scene->loadModel("SWORD", "Resources/sword/scene.gltf");
-	a_scene->loadModel("CAR", "Resources/demo/gtr-car.glb");
-	a_scene->loadModel("CAR", "Resources/bunny/scene.gtf");
+	a_scene->loadModel("SWORD", "assets/sword/scene.gltf");
+	a_scene->loadModel("GRIND", "assets/grind/scene.gltf");
+
+	
 
 	a_scene->createEntity(STATIC,"SWORD");
+	a_scene->createEntity(STATIC, "GRIND");
+
 	a_scene->createEntity(STATIC, "SPHERE", 0);
 
 

@@ -3,3 +3,5 @@ Asthrarisine.*
 dependencies/include/*
 dependencies/lib/*
 Resources/*
+assets/
+build
