@@ -1,6 +1,6 @@
-<h3 align="center"> ⚙️ Asthrarisine Engine — A High Performance Graphics Engine Powered by Modern OpenGL 4.6 </h2>
+<h1 align="center"> ⚙️ Asthrarisine Engine — A High Performance Graphics Engine Powered by Modern OpenGL 4.6 </h1>
 
-#    Created by Aman Gupta
+##   Created by Aman Gupta
 ![Arcball Demo](Resources/demo/free.gif)
 > A cross-platform, performance-first graphics engine built entirely with modern OpenGL 4.6 utilizing its Graphics Pipeline ,featuring Advanced GPU Instancing by single draw call using 'glMultiDrawIndirectInstanced()' containing ECS-based architecture, and in-editor scene manipulation. Designed for real-time 3D rendering, asset streaming, and extensibility.
 
@@ -54,6 +54,17 @@
 - Supports **`glMultiDrawElementsIndirect()`**, allowing thousands of meshes to be drawn in a single call.
 
 ---
+## Build Instruction
+```bash
+mkdir build
+cd build
+
+# Configure with MSVC generator
+cmake <project location {..} > -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release
+
+# Build with static runtime already forced
+cmake --build . --config Release
+```
 
 ##  Features at a Glance
 
